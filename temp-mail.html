@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>iOS Temp Mail WebApp</title>
+  <title>Temp Mail - iOS Style</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
@@ -11,10 +11,10 @@
       --card-bg: #ffffff;
       --accent-blue: #007aff;
       --accent-green: #34c759;
-      --accent-red: #ff3b30;
+      --accent-purple: #5856d6;
       --text-main: #000000;
       --text-muted: #8e8e93;
-      --border-color: #e5e5ea;
+      --border-color: #c6c6c8;
       --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
     }
 
@@ -25,19 +25,68 @@
       font-family: var(--font-family);
       -webkit-tap-highlight-color: transparent;
       user-select: none;
+      -webkit-user-select: none;
     }
 
     body {
       background-color: var(--bg-color);
       color: var(--text-main);
-      padding: 16px;
+      padding: 20px 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
+      position: relative;
     }
 
-    .app-container {
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+      opacity: 0;
+      z-index: 9999;
+    }
+
+    #toast.show {
+      top: 14px;
+      opacity: 1;
+    }
+
+    #toast .toast-icon {
+      background: var(--accent-green);
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Top Title */
+    .header-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      letter-spacing: -0.4px;
+    }
+
+    /* Main Container Card */
+    .container {
       width: 100%;
       max-width: 420px;
       display: flex;
@@ -45,281 +94,183 @@
       gap: 16px;
     }
 
-    .top-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 4px 0;
-    }
-
-    .nav-title {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-
-    .refresh-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(0, 122, 255, 0.1);
-      color: var(--accent-blue);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .spin {
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      100% { transform: rotate(360deg); }
-    }
-
-    .mail-card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 16px;
-      border: 1.5px solid rgba(52, 199, 89, 0.4);
-      box-shadow: 0 4px 16px rgba(52, 199, 89, 0.18);
+    /* Box Item Style */
+    .info-box-group {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 6px;
     }
 
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    .box-label {
       font-size: 12px;
       font-weight: 600;
       color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
+      padding-left: 4px;
     }
 
-    .live-status {
+    .input-wrapper {
+      position: relative;
       display: flex;
       align-items: center;
-      gap: 6px;
-      color: var(--accent-green);
+      width: 100%;
     }
 
-    .pulse-dot {
-      width: 8px;
-      height: 8px;
-      background-color: var(--accent-green);
-      border-radius: 50%;
-      box-shadow: 0 0 0 rgba(52, 199, 89, 0.4);
-      animation: pulse 1.6s infinite;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.7); }
-      70% { box-shadow: 0 0 0 8px rgba(52, 199, 89, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
-    }
-
-    .email-display-row {
-      display: flex;
-      align-items: center;
-      background: #f8f8fa;
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 6px 6px 6px 12px;
-      gap: 8px;
-    }
-
-    .email-text {
-      flex: 1;
-      font-size: 14px;
-      font-weight: 600;
+    /* Compact Input/Box with Green Glow */
+    .ios-box {
+      width: 100%;
+      padding: 10px 44px 10px 12px;
+      background: var(--card-bg);
+      border: 1.5px solid var(--accent-green);
+      border-radius: 10px;
+      font-size: 14.5px;
+      font-family: monospace, var(--font-family);
       color: var(--text-main);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      outline: none;
+      box-shadow: 0 0 10px rgba(52, 199, 89, 0.25), 0 2px 6px rgba(52, 199, 89, 0.15);
+      transition: all 0.3s ease;
       user-select: text;
+      -webkit-user-select: text;
     }
 
-    .btn-copy {
-      background: var(--accent-blue);
-      color: #ffffff;
+    .ios-box:focus {
+      box-shadow: 0 0 14px rgba(52, 199, 89, 0.4), 0 2px 8px rgba(52, 199, 89, 0.2);
+    }
+
+    /* Copy Button inside Box (Right Side) */
+    .box-copy-btn {
+      position: absolute;
+      right: 8px;
+      width: 26px;
+      height: 26px;
+      background: #f0f0f5;
+      color: var(--accent-blue);
       border: none;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
+      border-radius: 50%;
       display: flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
-    .controls-row {
+    .box-copy-btn.copied {
+      background: var(--accent-green) !important;
+      color: #ffffff !important;
+    }
+
+    /* Buttons Row */
+    .action-container {
+      width: 100%;
+      max-width: 420px;
+      margin-top: 12px;
       display: flex;
-      gap: 10px;
+      gap: 12px;
     }
 
     .btn-action {
       flex: 1;
-      padding: 10px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 600;
+      background: var(--accent-blue);
+      color: #ffffff;
       border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-    }
-
-    .btn-change {
-      background: rgba(0, 122, 255, 0.1);
-      color: var(--accent-blue);
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
+      transition: opacity 0.2s ease;
     }
 
     .btn-save {
-      background: rgba(52, 199, 89, 0.12);
-      color: var(--accent-green);
+      background: var(--accent-purple);
+      box-shadow: 0 4px 12px rgba(88, 86, 214, 0.25);
     }
 
-    .save-circle-icon {
-      width: 18px;
-      height: 18px;
-      background: var(--accent-green);
-      border-radius: 50%;
+    .btn-action:active {
+      opacity: 0.8;
+    }
+
+    .btn-content {
       display: flex;
       align-items: center;
-      justify-content: center;
-    }
-
-    .inbox-section {
-      display: flex;
-      flex-direction: column;
       gap: 8px;
     }
 
-    .section-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      padding-left: 4px;
+    /* iOS Spinner Animation */
+    .ios-spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      animation: iosRotate 0.8s steps(8, end) infinite;
+    }
+
+    @keyframes iosRotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Inbox Section */
+    .inbox-wrapper {
+      width: 100%;
+      max-width: 420px;
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
     .inbox-card {
       background: var(--card-bg);
-      border-radius: 16px;
-      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,0.06);
       overflow: hidden;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
 
     .empty-inbox {
-      padding: 36px 16px;
+      padding: 24px 16px;
       text-align: center;
       color: var(--text-muted);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
+      font-size: 13.5px;
     }
 
-    .mail-item {
-      padding: 14px 16px;
-      display: flex;
-      gap: 12px;
-      border-bottom: 1px solid var(--border-color);
+    .msg-item {
+      padding: 12px 14px;
+      border-bottom: 1px solid #e5e5ea;
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: background 0.15s ease;
     }
 
-    .mail-item:last-child {
+    .msg-item:last-child {
       border-bottom: none;
     }
 
-    .mail-item:active {
+    .msg-item:active {
       background: #f2f2f7;
     }
 
-    .avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: var(--accent-blue);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 16px;
-      flex-shrink: 0;
-    }
-
-    .mail-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      overflow: hidden;
-    }
-
-    .mail-header-line {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .mail-sender {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text-main);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .mail-time {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .mail-subject {
-      font-size: 13px;
+    .msg-from {
+      font-size: 13.5px;
       font-weight: 600;
-      color: #3a3a3c;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      color: var(--text-main);
     }
 
-    .mail-preview {
-      font-size: 12px;
+    .msg-subj {
+      font-size: 12.5px;
       color: var(--text-muted);
+      margin-top: 2px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    .otp-badge {
-      display: inline-flex;
-      align-items: center;
-      background: rgba(255, 59, 48, 0.1);
-      color: var(--accent-red);
-      font-weight: 700;
-      font-size: 11px;
-      padding: 2px 6px;
-      border-radius: 6px;
-      margin-top: 4px;
-      width: fit-content;
-    }
-
+    /* Modal Sheet */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -331,28 +282,17 @@
       z-index: 999;
     }
 
-    .modal-overlay.show {
-      display: flex;
-    }
+    .modal-overlay.show { display: flex; }
 
     .modal-sheet {
       background: var(--card-bg);
       width: 100%;
-      max-width: 440px;
+      max-width: 420px;
       border-top-left-radius: 20px;
       border-top-right-radius: 20px;
       padding: 20px;
-      max-height: 85vh;
+      max-height: 80vh;
       overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      animation: slideUp 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
     }
 
     .modal-header {
@@ -360,157 +300,102 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border-color);
-      padding-bottom: 12px;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
     }
-
-    .modal-title {
-      font-size: 16px;
-      font-weight: 700;
-    }
-
-    .close-btn {
-      background: rgba(142, 142, 147, 0.15);
-      border: none;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .form-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    .form-input, .form-select {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-      font-size: 14px;
-      outline: none;
-      background: #f8f8fa;
-    }
-
-    #copy-toast {
-      position: fixed;
-      top: -60px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #000;
-      color: #fff;
-      padding: 10px 18px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
-      transition: top 0.3s ease;
-      z-index: 9999;
-    }
-
-    #copy-toast.show { top: 16px; }
   </style>
 </head>
-<body>
+<body onload="initMail()">
 
-  <div id="copy-toast">
-    <div style="width: 16px; height: 16px; background: var(--accent-green); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+  <!-- Toast Notification -->
+  <div id="toast">
+    <div class="toast-icon">
+      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
     </div>
-    <span>Copied to clipboard!</span>
+    <span>Copied Successfully!</span>
   </div>
 
-  <div class="app-container">
+  <h1 class="header-title">Temp Mail Generator</h1>
+
+  <div class="container">
     
-    <div class="top-nav">
-      <h1 class="nav-title">Temp Mail</h1>
-      <div class="refresh-badge" onclick="manualRefresh()">
-        <svg id="refresh-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-        <span>Auto Sync</span>
-      </div>
-    </div>
-
-    <div class="mail-card">
-      <div class="card-header">
-        <span>Active Temporary Address</span>
-        <div class="live-status">
-          <div class="pulse-dot"></div>
-          <span>Live</span>
-        </div>
-      </div>
-
-      <div class="email-display-row">
-        <span id="active-email" class="email-text">Generating email...</span>
-        <button id="btn-copy" class="btn-copy" onclick="copyEmail()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          <span>Copy</span>
-        </button>
-      </div>
-
-      <div class="controls-row">
-        <button class="btn-action btn-change" onclick="createNewMail()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-          <span>Change</span>
-        </button>
-        <button class="btn-action btn-save" onclick="openSaveModal()">
-          <div class="save-circle-icon">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <span>Save</span>
+    <!-- Username Box -->
+    <div class="info-box-group">
+      <label class="box-label">Username</label>
+      <div class="input-wrapper">
+        <input type="text" id="username-box" class="ios-box" readonly placeholder="Generating...">
+        <button class="box-copy-btn" onclick="copyValue('username-box', this)" title="Copy">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
         </button>
       </div>
     </div>
 
-    <div class="inbox-section">
-      <span class="section-title">Inbox Messages</span>
-      <div class="inbox-card" id="inbox-container">
-        <div class="empty-inbox">
-          <div class="pulse-dot" style="width:12px; height:12px;"></div>
-          <span>Waiting for incoming messages...</span>
-        </div>
+    <!-- Email Box -->
+    <div class="info-box-group">
+      <label class="box-label">Email Address</label>
+      <div class="input-wrapper">
+        <input type="text" id="email-box" class="ios-box" readonly placeholder="Generating...">
+        <button class="box-copy-btn" onclick="copyValue('email-box', this)" title="Copy">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Password Box -->
+    <div class="info-box-group">
+      <label class="box-label">Password</label>
+      <div class="input-wrapper">
+        <input type="text" id="password-box" class="ios-box" readonly placeholder="Generating...">
+        <button class="box-copy-btn" onclick="copyValue('password-box', this)" title="Copy">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        </button>
       </div>
     </div>
 
   </div>
 
-  <!-- Save Modal -->
-  <div class="modal-overlay" id="save-modal">
-    <div class="modal-sheet">
-      <div class="modal-header">
-        <span class="modal-title">Save Mail Account</span>
-        <button class="close-btn" onclick="closeSaveModal()">✕</button>
+  <!-- Action Buttons -->
+  <div class="action-container">
+    <button class="btn-action" id="random-btn" onclick="triggerChangeWithLoading()">
+      <div class="btn-content" id="btn-inner">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 4v6h-6"></path>
+          <path d="M1 20v-6h6"></path>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+        <span>Change</span>
       </div>
-      <div class="form-group">
-        <label class="form-label">Platform Category</label>
-        <select id="save-platform" class="form-select" onchange="togglePlatformInputs()">
-          <option value="General">General</option>
-          <option value="Free Fire">Free Fire</option>
-          <option value="Twitter">Twitter</option>
-          <option value="Facebook">Facebook</option>
-        </select>
+      <svg class="ios-spinner" viewBox="0 0 24 24">
+        <line x1="12" y1="3" x2="12" y2="6" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="1"/>
+        <line x1="18.36" y1="5.64" x2="16.24" y2="7.76" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.875"/>
+        <line x1="21" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.75"/>
+        <line x1="18.36" y1="18.36" x2="16.24" y2="16.24" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.625"/>
+        <line x1="12" y1="21" x2="12" y2="18" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+        <line x1="5.64" y1="18.36" x2="7.76" y2="16.24" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.375"/>
+        <line x1="3" y1="12" x2="6" y2="12" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>
+        <line x1="5.64" y1="5.64" x2="7.76" y2="7.76" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.125"/>
+      </svg>
+    </button>
+
+    <button class="btn-action btn-save" onclick="saveMailData()">
+      <div class="btn-content">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+          <polyline points="17 21 17 13 7 13 7 21"></polyline>
+          <polyline points="7 3 7 8 15 8"></polyline>
+        </svg>
+        <span>Save</span>
       </div>
-      <div class="form-group" id="user-field-group">
-        <label class="form-label" id="user-label">Username / ID (Optional)</label>
-        <input type="text" id="save-username" class="form-input" placeholder="e.g. Player ID or Username">
-      </div>
-      <div class="form-group" id="pass-field-group">
-        <label class="form-label">Account Password (Optional)</label>
-        <input type="text" id="save-password" class="form-input" placeholder="Platform password if any">
-      </div>
-      <button class="btn-copy" style="width:100%; justify-content:center; padding:12px;" onclick="submitSaveData()">
-        Confirm & Save
-      </button>
+    </button>
+  </div>
+
+  <!-- Inbox Area -->
+  <div class="inbox-wrapper">
+    <label class="box-label">Inbox Messages</label>
+    <div class="inbox-card" id="inbox-container">
+      <div class="empty-inbox">Waiting for incoming messages...</div>
     </div>
   </div>
 
@@ -518,11 +403,11 @@
   <div class="modal-overlay" id="mail-modal">
     <div class="modal-sheet">
       <div class="modal-header">
-        <span class="modal-title" id="view-subject">Message Subject</span>
-        <button class="close-btn" onclick="closeMailModal()">✕</button>
+        <strong id="view-subject" style="font-size:15px;">Subject</strong>
+        <button style="border:none; background:none; font-size:16px; font-weight:bold; cursor:pointer;" onclick="closeModal()">✕</button>
       </div>
-      <div style="font-size:12px; color:var(--text-muted);" id="view-from">From: sender@domain.com</div>
-      <div id="view-body" style="font-size:14px; line-height:1.5; color:var(--text-main); user-select:text; margin-top:8px;"></div>
+      <div id="view-from" style="font-size:12px; color:var(--text-muted); margin-bottom:10px;"></div>
+      <div id="view-body" style="font-size:14px; line-height:1.4; color:var(--text-main); user-select:text; -webkit-user-select:text;"></div>
     </div>
   </div>
 
@@ -530,249 +415,169 @@
     const tg = window.Telegram ? window.Telegram.WebApp : null;
     if (tg) tg.ready();
 
-    const API_SERVERS = ["https://api.mail.tm", "https://api.mail.gw"];
-    const INTERNAL_PASS = "InternalPass123!"; // BJS ফিক্সড ইন্টারনাল পাসওয়ার্ড
+    const INTERNAL_PASS = "InternalPass123!";
+    const copyIconSVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+    const copiedCheckSVG = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
 
-    let activeApiBase = API_SERVERS[0];
+    let toastTimer;
     let currentEmail = "";
+    let currentUsername = "";
     let currentToken = "";
-    let fetchedMessageIds = new Set();
-    let pollTimer = null;
+    let pollInterval = null;
 
-    window.addEventListener('DOMContentLoaded', async () => {
-      let saved = localStorage.getItem('temp_mail_data');
-      if (saved) {
-        try {
-          let parsed = JSON.parse(saved);
-          currentEmail = parsed.email;
-          currentToken = parsed.token;
-          activeApiBase = parsed.apiBase || API_SERVERS[0];
-          document.getElementById('active-email').innerText = currentEmail;
-          startPolling();
-          return;
-        } catch(e){}
-      }
-      await createNewMail();
-    });
-
-    // 8 অক্ষরের র্যান্ডম ইউজারনেম জেনারেটর (temp_ প্রিফিক্স সহ)
-    function generateRandomUser() {
-      const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-      let result = "temp_";
-      for (let i = 0; i < 8; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return result;
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 2000);
     }
 
-    async function createNewMail() {
-      stopPolling();
-      document.getElementById('active-email').innerText = "Generating email...";
-      document.getElementById('inbox-container').innerHTML = `
-        <div class="empty-inbox">
-          <div class="pulse-dot" style="width:12px; height:12px;"></div>
-          <span>Waiting for incoming messages...</span>
-        </div>`;
-      fetchedMessageIds.clear();
-
-      for (let baseUrl of API_SERVERS) {
-        try {
-          // ১. ডাইনামিক ডোমেইন ফেচ করা (BJS Step 1)
-          let domRes = await fetch(`${baseUrl}/domains`);
-          if (!domRes.ok) continue;
-          let domData = await domRes.json();
-          let domainList = domData["hydra:member"] || [];
-          if (domainList.length === 0) continue;
-
-          // প্রথম সক্রিয় ডোমেইনটি পিক করবে (domains[0].domain)
-          let domain = domainList[0].domain;
-
-          // ২. temp_xxxxxxxx ফরম্যাটে ইমেইল তৈরি (BJS Step 2)
-          let randUser = generateRandomUser();
-          let email = `${randUser}@${domain}`;
-
-          // ৩. অ্যাকাউন্ট রেজিস্টার করা (BJS Step 2: InternalPass123!)
-          let accRes = await fetch(`${baseUrl}/accounts`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ address: email, password: INTERNAL_PASS })
-          });
-
-          if (!accRes.ok && accRes.status !== 409) continue;
-
-          // ৪. Bearer Token গেট করা (BJS Step 3)
-          let tokenRes = await fetch(`${baseUrl}/token`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ address: email, password: INTERNAL_PASS })
-          });
-
-          if (!tokenRes.ok) continue;
-          let tokenData = await tokenRes.json();
-          if (!tokenData.token) continue;
-
-          // সফল হলে স্টেট আপডেট ও সেভ
-          activeApiBase = baseUrl;
-          currentEmail = email;
-          currentToken = tokenData.token;
-
-          document.getElementById('active-email').innerText = currentEmail;
-
-          localStorage.setItem('temp_mail_data', JSON.stringify({
-            email: currentEmail, token: currentToken, apiBase: activeApiBase
-          }));
-
-          startPolling();
-          return;
-        } catch (err) {
-          console.warn("API Error:", err);
-        }
-      }
-
-      document.getElementById('active-email').innerText = "Failed to create mail!";
-    }
-
-    // ইনবক্সের মেসেজ ফেচ ও চেক করা (BJS Step 4)
-    async function checkInbox() {
-      if (!currentToken || !activeApiBase) return;
-      try {
-        let res = await fetch(`${activeApiBase}/messages`, {
-          headers: { "Authorization": "Bearer " + currentToken }
-        });
-        if (!res.ok) return;
-
-        let data = await res.json();
-        let messages = data["hydra:member"] || [];
-
-        if (messages.length === 0) return;
-
-        let container = document.getElementById('inbox-container');
-        if (container.querySelector('.empty-inbox')) {
-          container.innerHTML = "";
-        }
-
-        messages.forEach(msg => {
-          if (!fetchedMessageIds.has(msg.id)) {
-            fetchedMessageIds.add(msg.id);
-            renderMailItem(msg, container);
-          }
-        });
-      } catch (e) {}
-    }
-
-    function renderMailItem(msg, container) {
-      let fromAddr = msg.from ? msg.from.address : "Unknown";
-      let initial = fromAddr.charAt(0).toUpperCase();
-      let subject = msg.subject || "(No Subject)";
-      let intro = msg.intro || "(No preview available)";
-
-      let otpMatch = (subject + " " + intro).match(/\b\d{4,8}\b/);
-      let otpBadgeHTML = otpMatch ? `<div class="otp-badge">Code: ${otpMatch[0]}</div>` : '';
-
-      let item = document.createElement('div');
-      item.className = 'mail-item';
-      item.onclick = () => openMailDetail(msg.id, subject, fromAddr);
-
-      item.innerHTML = `
-        <div class="avatar">${initial}</div>
-        <div class="mail-content">
-          <div class="mail-header-line">
-            <span class="mail-sender">${fromAddr}</span>
-            <span class="mail-time">${new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-          </div>
-          <div class="mail-subject">${subject}</div>
-          <div class="mail-preview">${intro}</div>
-          ${otpBadgeHTML}
-        </div>
-      `;
-      container.prepend(item);
-    }
-
-    async function openMailDetail(msgId, subject, from) {
-      document.getElementById('view-subject').innerText = subject;
-      document.getElementById('view-from').innerText = "From: " + from;
-      document.getElementById('view-body').innerText = "Loading content...";
-      document.getElementById('mail-modal').classList.add('show');
-
-      try {
-        let res = await fetch(`${activeApiBase}/messages/${msgId}`, {
-          headers: { "Authorization": "Bearer " + currentToken }
-        });
-        let data = await res.json();
-        document.getElementById('view-body').innerHTML = data.html ? data.html[0] : (data.text || "No content");
-      } catch(e) {
-        document.getElementById('view-body').innerText = "Failed to load message detail.";
-      }
-    }
-
-    function closeMailModal() {
-      document.getElementById('mail-modal').classList.remove('show');
-    }
-
-    function startPolling() {
-      checkInbox();
-      pollTimer = setInterval(checkInbox, 4000);
-    }
-
-    function stopPolling() {
-      if (pollTimer) clearInterval(pollTimer);
-    }
-
-    function manualRefresh() {
-      let icon = document.getElementById('refresh-icon');
-      icon.classList.add('spin');
-      checkInbox().finally(() => setTimeout(() => icon.classList.remove('spin'), 800));
-    }
-
-    function copyEmail() {
-      if (!currentEmail || currentEmail.includes("Generating")) return;
-      navigator.clipboard.writeText(currentEmail).then(() => {
-        let toast = document.getElementById('copy-toast');
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2000);
+    function copyValue(elementId, btnElement) {
+      const val = document.getElementById(elementId).value;
+      if (!val) return;
+      navigator.clipboard.writeText(val).then(() => {
+        btnElement.classList.add('copied');
+        btnElement.innerHTML = copiedCheckSVG;
+        showToast();
+        setTimeout(() => {
+          btnElement.classList.remove('copied');
+          btnElement.innerHTML = copyIconSVG;
+        }, 2000);
       });
     }
 
-    function openSaveModal() {
-      document.getElementById('save-modal').classList.add('show');
+    function generateRandomUsername() {
+      const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+      let res = "temp_";
+      for (let i = 0; i < 8; i++) {
+        res += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return res;
     }
 
-    function closeSaveModal() {
-      document.getElementById('save-modal').classList.remove('show');
-    }
+    async function initMail() {
+      if (pollInterval) clearInterval(pollInterval);
+      document.getElementById('inbox-container').innerHTML = '<div class="empty-inbox">Waiting for incoming messages...</div>';
 
-    function togglePlatformInputs() {
-      let platform = document.getElementById('save-platform').value;
-      let userLabel = document.getElementById('user-label');
-      if (platform === "Free Fire") {
-        userLabel.innerText = "Player ID";
-      } else {
-        userLabel.innerText = "Username / ID (Optional)";
+      try {
+        // Step 1: Fetch active dynamic domain (domains[0].domain)
+        let domRes = await fetch("https://api.mail.tm/domains");
+        let domData = await domRes.json();
+        let domain = domData["hydra:member"][0].domain;
+
+        // Step 2: Generate username & email
+        currentUsername = generateRandomUsername();
+        currentEmail = `${currentUsername}@${domain}`;
+
+        // Step 3: Register Account
+        await fetch("https://api.mail.tm/accounts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ address: currentEmail, password: INTERNAL_PASS })
+        });
+
+        // Step 4: Fetch Bearer Token
+        let tokenRes = await fetch("https://api.mail.tm/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ address: currentEmail, password: INTERNAL_PASS })
+        });
+
+        let tokenData = await tokenRes.json();
+        currentToken = tokenData.token;
+
+        // Populate Input Boxes
+        document.getElementById('username-box').value = currentUsername;
+        document.getElementById('email-box').value = currentEmail;
+        document.getElementById('password-box').value = INTERNAL_PASS;
+
+        // Start Inbox Polling
+        startPolling();
+      } catch (err) {
+        console.error("Mail creation error:", err);
       }
     }
 
-    function submitSaveData() {
-      let platform = document.getElementById('save-platform').value;
-      let username = document.getElementById('save-username').value.trim();
-      let platformPassword = document.getElementById('save-password').value.trim();
+    function triggerChangeWithLoading() {
+      const btn = document.getElementById('random-btn');
+      const innerContent = document.getElementById('btn-inner');
+      const spinner = btn.querySelector('.ios-spinner');
 
+      innerContent.style.display = 'none';
+      spinner.style.display = 'inline-block';
+      btn.disabled = true;
+
+      // Exactly 1-second iOS Spinner loading delay
+      setTimeout(async () => {
+        await initMail();
+        spinner.style.display = 'none';
+        innerContent.style.display = 'flex';
+        btn.disabled = false;
+      }, 1000);
+    }
+
+    function saveMailData() {
+      // Clean Payload without extra data
       let payload = {
-        action: "save_temp_mail",
         email: currentEmail,
-        token: currentToken,
-        password: INTERNAL_PASS,
-        platform: platform,
-        username: username || "N/A",
-        platformPassword: platformPassword || "N/A",
-        createdAt: new Date().toISOString()
+        username: currentUsername,
+        password: INTERNAL_PASS
       };
 
       if (tg && tg.sendData) {
         tg.sendData(JSON.stringify(payload));
       } else {
-        alert("BJS Send Data Payload:\n" + JSON.stringify(payload, null, 2));
+        alert("Payload sent to Telegram:\n" + JSON.stringify(payload, null, 2));
       }
-      closeSaveModal();
+    }
+
+    function startPolling() {
+      pollInterval = setInterval(async () => {
+        if (!currentToken) return;
+        try {
+          let res = await fetch("https://api.mail.tm/messages", {
+            headers: { "Authorization": "Bearer " + currentToken }
+          });
+          let data = await res.json();
+          let msgs = data["hydra:member"] || [];
+
+          if (msgs.length > 0) {
+            let container = document.getElementById('inbox-container');
+            container.innerHTML = "";
+            msgs.forEach(m => {
+              let item = document.createElement('div');
+              item.className = 'msg-item';
+              item.onclick = () => openMessage(m.id, m.subject, m.from.address);
+              item.innerHTML = `
+                <div class="msg-from">${m.from.address}</div>
+                <div class="msg-subj">${m.subject || '(No Subject)'}</div>
+              `;
+              container.appendChild(item);
+            });
+          }
+        } catch(e){}
+      }, 4000);
+    }
+
+    async function openMessage(msgId, subject, from) {
+      document.getElementById('view-subject').innerText = subject || '(No Subject)';
+      document.getElementById('view-from').innerText = "From: " + from;
+      document.getElementById('view-body').innerText = "Loading message...";
+      document.getElementById('mail-modal').classList.add('show');
+
+      try {
+        let res = await fetch(`https://api.mail.tm/messages/${msgId}`, {
+          headers: { "Authorization": "Bearer " + currentToken }
+        });
+        let data = await res.json();
+        document.getElementById('view-body').innerHTML = data.html ? data.html[0] : (data.text || "No Content");
+      } catch(e) {
+        document.getElementById('view-body').innerText = "Failed to load details.";
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('mail-modal').classList.remove('show');
     }
   </script>
 </body>
