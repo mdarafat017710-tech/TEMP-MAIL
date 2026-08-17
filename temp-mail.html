@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Temp Mail - iOS Style</title>
+  <title>Temp Mail</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
@@ -31,7 +31,7 @@
     body {
       background-color: var(--bg-color);
       color: var(--text-main);
-      padding: 20px 16px;
+      padding: 24px 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -94,7 +94,7 @@
       gap: 16px;
     }
 
-    /* Box Item Style */
+    /* Single Box Item Style */
     .info-box-group {
       display: flex;
       flex-direction: column;
@@ -116,14 +116,14 @@
       width: 100%;
     }
 
-    /* Compact Input/Box with Green Glow */
+    /* Green Glowing Box */
     .ios-box {
       width: 100%;
-      padding: 10px 44px 10px 12px;
+      padding: 12px 44px 12px 14px;
       background: var(--card-bg);
       border: 1.5px solid var(--accent-green);
-      border-radius: 10px;
-      font-size: 14.5px;
+      border-radius: 12px;
+      font-size: 15px;
       font-family: monospace, var(--font-family);
       color: var(--text-main);
       outline: none;
@@ -137,12 +137,12 @@
       box-shadow: 0 0 14px rgba(52, 199, 89, 0.4), 0 2px 8px rgba(52, 199, 89, 0.2);
     }
 
-    /* Copy Button inside Box (Right Side) */
+    /* Copy Button inside Box */
     .box-copy-btn {
       position: absolute;
-      right: 8px;
-      width: 26px;
-      height: 26px;
+      right: 10px;
+      width: 28px;
+      height: 28px;
       background: #f0f0f5;
       color: var(--accent-blue);
       border: none;
@@ -160,11 +160,11 @@
       color: #ffffff !important;
     }
 
-    /* Buttons Row */
+    /* Action Buttons Area */
     .action-container {
       width: 100%;
       max-width: 420px;
-      margin-top: 12px;
+      margin-top: 14px;
       display: flex;
       gap: 12px;
     }
@@ -219,7 +219,7 @@
     .inbox-wrapper {
       width: 100%;
       max-width: 420px;
-      margin-top: 20px;
+      margin-top: 22px;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -270,7 +270,7 @@
       white-space: nowrap;
     }
 
-    /* Modal Sheet */
+    /* Modal Sheet for Message View */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -320,40 +320,16 @@
   <h1 class="header-title">Temp Mail Generator</h1>
 
   <div class="container">
-    
-    <!-- Username Box -->
+    <!-- Single Temporary Email Box -->
     <div class="info-box-group">
-      <label class="box-label">Username</label>
+      <label class="box-label">Temporary Email Address</label>
       <div class="input-wrapper">
-        <input type="text" id="username-box" class="ios-box" readonly placeholder="Generating...">
-        <button class="box-copy-btn" onclick="copyValue('username-box', this)" title="Copy">
+        <input type="text" id="email-box" class="ios-box" readonly placeholder="Generating email...">
+        <button class="box-copy-btn" onclick="copyValue('email-box', this)" title="Copy Email">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
         </button>
       </div>
     </div>
-
-    <!-- Email Box -->
-    <div class="info-box-group">
-      <label class="box-label">Email Address</label>
-      <div class="input-wrapper">
-        <input type="text" id="email-box" class="ios-box" readonly placeholder="Generating...">
-        <button class="box-copy-btn" onclick="copyValue('email-box', this)" title="Copy">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- Password Box -->
-    <div class="info-box-group">
-      <label class="box-label">Password</label>
-      <div class="input-wrapper">
-        <input type="text" id="password-box" class="ios-box" readonly placeholder="Generating...">
-        <button class="box-copy-btn" onclick="copyValue('password-box', this)" title="Copy">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-        </button>
-      </div>
-    </div>
-
   </div>
 
   <!-- Action Buttons -->
@@ -391,7 +367,7 @@
     </button>
   </div>
 
-  <!-- Inbox Area -->
+  <!-- Inbox Section -->
   <div class="inbox-wrapper">
     <label class="box-label">Inbox Messages</label>
     <div class="inbox-card" id="inbox-container">
@@ -460,23 +436,23 @@
       document.getElementById('inbox-container').innerHTML = '<div class="empty-inbox">Waiting for incoming messages...</div>';
 
       try {
-        // Step 1: Fetch active dynamic domain (domains[0].domain)
+        // Step 1: BJS Domain Logic (API-র প্রথম ডোমেইন domains[0].domain)
         let domRes = await fetch("https://api.mail.tm/domains");
         let domData = await domRes.json();
         let domain = domData["hydra:member"][0].domain;
 
-        // Step 2: Generate username & email
+        // Step 2: Username & Email Generation
         currentUsername = generateRandomUsername();
         currentEmail = `${currentUsername}@${domain}`;
 
-        // Step 3: Register Account
+        // Step 3: Register Temp Account
         await fetch("https://api.mail.tm/accounts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ address: currentEmail, password: INTERNAL_PASS })
         });
 
-        // Step 4: Fetch Bearer Token
+        // Step 4: Get Token
         let tokenRes = await fetch("https://api.mail.tm/token", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -486,10 +462,8 @@
         let tokenData = await tokenRes.json();
         currentToken = tokenData.token;
 
-        // Populate Input Boxes
-        document.getElementById('username-box').value = currentUsername;
+        // Set value in the single email box
         document.getElementById('email-box').value = currentEmail;
-        document.getElementById('password-box').value = INTERNAL_PASS;
 
         // Start Inbox Polling
         startPolling();
@@ -507,7 +481,7 @@
       spinner.style.display = 'inline-block';
       btn.disabled = true;
 
-      // Exactly 1-second iOS Spinner loading delay
+      // Exactly 1-second iOS Spinner loading animation
       setTimeout(async () => {
         await initMail();
         spinner.style.display = 'none';
@@ -517,7 +491,7 @@
     }
 
     function saveMailData() {
-      // Clean Payload without extra data
+      // Save Payload according to BJS setup
       let payload = {
         email: currentEmail,
         username: currentUsername,
@@ -527,7 +501,7 @@
       if (tg && tg.sendData) {
         tg.sendData(JSON.stringify(payload));
       } else {
-        alert("Payload sent to Telegram:\n" + JSON.stringify(payload, null, 2));
+        alert("Payload sent:\n" + JSON.stringify(payload, null, 2));
       }
     }
 
