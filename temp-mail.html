@@ -45,7 +45,6 @@
       gap: 16px;
     }
 
-    /* Top Navigation */
     .top-nav {
       display: flex;
       justify-content: space-between;
@@ -80,7 +79,6 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* iOS Style Glowing Active Email Card */
     .mail-card {
       background: var(--card-bg);
       border-radius: 16px;
@@ -161,7 +159,6 @@
       transition: all 0.2s ease;
     }
 
-    /* Controls Row */
     .controls-row {
       display: flex;
       gap: 10px;
@@ -201,7 +198,6 @@
       justify-content: center;
     }
 
-    /* Inbox List */
     .inbox-section {
       display: flex;
       flex-direction: column;
@@ -324,7 +320,6 @@
       width: fit-content;
     }
 
-    /* Modal Styling */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -429,7 +424,6 @@
 </head>
 <body>
 
-  <!-- Copy Toast -->
   <div id="copy-toast">
     <div style="width: 16px; height: 16px; background: var(--accent-green); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -439,7 +433,6 @@
 
   <div class="app-container">
     
-    <!-- Top Nav -->
     <div class="top-nav">
       <h1 class="nav-title">Temp Mail</h1>
       <div class="refresh-badge" onclick="manualRefresh()">
@@ -448,7 +441,6 @@
       </div>
     </div>
 
-    <!-- Active Email Card -->
     <div class="mail-card">
       <div class="card-header">
         <span>Active Temporary Address</span>
@@ -480,7 +472,6 @@
       </div>
     </div>
 
-    <!-- Inbox List -->
     <div class="inbox-section">
       <span class="section-title">Inbox Messages</span>
       <div class="inbox-card" id="inbox-container">
@@ -493,11 +484,10 @@
 
   </div>
 
-  <!-- BJS Save Modal -->
   <div class="modal-overlay" id="save-modal">
     <div class="modal-sheet">
       <div class="modal-header">
-        <span class="modal-title">Save Mail to Telegram</span>
+        <span class="modal-title">Save Mail Account</span>
         <button class="close-btn" onclick="closeSaveModal()">✕</button>
       </div>
       <div class="form-group">
@@ -514,16 +504,15 @@
         <input type="text" id="save-username" class="form-input" placeholder="e.g. Player ID or Username">
       </div>
       <div class="form-group" id="pass-field-group">
-        <label class="form-label">Platform Password (Optional)</label>
+        <label class="form-label">Account Password (Optional)</label>
         <input type="text" id="save-password" class="form-input" placeholder="Platform password if any">
       </div>
       <button class="btn-copy" style="width:100%; justify-content:center; padding:12px;" onclick="submitSaveData()">
-        Confirm & Save Token
+        Confirm & Save
       </button>
     </div>
   </div>
 
-  <!-- Message Detail Modal -->
   <div class="modal-overlay" id="mail-modal">
     <div class="modal-sheet">
       <div class="modal-header">
@@ -539,6 +528,13 @@
     const tg = window.Telegram ? window.Telegram.WebApp : null;
     if (tg) tg.ready();
 
+    // Endpoints for failover
+    const API_ENDPOINTS = [
+      "https://api.mail.tm",
+      "https://api.mail.gw"
+    ];
+
+    let activeBase = API_ENDPOINTS[0];
     let currentEmail = "";
     let currentPassword = "";
     let currentToken = "";
@@ -553,7 +549,8 @@
           currentEmail = parsed.email;
           currentPassword = parsed.password;
           currentToken = parsed.token;
-          
+          activeBase = parsed.apiBase || API_ENDPOINTS[0];
+
           if (currentEmail && currentToken) {
             document.getElementById('active-email').innerText = currentEmail;
             startPolling();
@@ -564,14 +561,18 @@
       await createNewMail();
     });
 
-    // Helper: Standard Valid Password generator for mail.tm
-    function generateValidPassword() {
-      const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-      let pass = "Pass_";
-      for (let i = 0; i < 8; i++) {
-        pass += chars.charAt(Math.floor(Math.random() * chars.length));
+    // Custom safe fetch with API mirror fallback
+    async function safeFetch(path, options = {}) {
+      for (let base of API_ENDPOINTS) {
+        try {
+          let res = await fetch(`${base}${path}`, options);
+          if (res.ok || res.status === 409) {
+            activeBase = base;
+            return res;
+          }
+        } catch(e) {}
       }
-      return pass;
+      return null;
     }
 
     async function createNewMail() {
@@ -585,68 +586,67 @@
       fetchedMessageIds.clear();
 
       try {
-        // Step 1: Fetch Available Active Domains
-        let domRes = await fetch("https://api.mail.tm/domains");
-        if (!domRes.ok) throw new Error("Domain fetch failed");
+        // Step 1: Fetch domains
+        let domRes = await safeFetch("/domains");
+        if (!domRes) throw new Error("Domains unavailable");
         let domData = await domRes.json();
         let domainList = domData["hydra:member"] || [];
-        if (domainList.length === 0) throw new Error("No domain available");
-        
-        let domain = domainList[0].domain;
+        if (domainList.length === 0) throw new Error("Empty domains");
 
-        // Step 2: Random Username & Valid Password
-        let randUser = "user_" + Math.random().toString(36).substring(2, 10);
-        let email = `${randUser}@${domain}`;
-        let password = generateValidPassword();
+        let domain = domainList[Math.floor(Math.random() * domainList.length)].domain;
 
-        // Step 3: Create Account via POST /accounts
-        let accRes = await fetch("https://api.mail.tm/accounts", {
+        // Step 2: Specific strict password format required by mail.tm
+        let randStr = Math.random().toString(36).substring(2, 10);
+        let email = `user_${randStr}@${domain}`;
+        let password = `Bjs#${randStr}99`; // Meets length, digit, symbol, uppercase rules
+
+        // Step 3: Account Creation
+        let accRes = await safeFetch("/accounts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ address: email, password: password })
         });
 
-        if (!accRes.ok && accRes.status !== 409) {
-          throw new Error("Account creation failed");
-        }
+        if (!accRes) throw new Error("Account creation failed");
 
-        // Step 4: Obtain Bearer Token via POST /token
-        let tokenRes = await fetch("https://api.mail.tm/token", {
+        // Step 4: Token Fetching
+        let tokenRes = await safeFetch("/token", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ address: email, password: password })
         });
 
-        if (!tokenRes.ok) throw new Error("Token fetch failed");
+        if (!tokenRes) throw new Error("Token fetch failed");
         let tokenData = await tokenRes.json();
-        
-        if (!tokenData.token) throw new Error("Token empty");
 
-        // Set global variables
+        if (!tokenData.token) throw new Error("Empty token response");
+
+        // Save active credentials
         currentEmail = email;
         currentPassword = password;
         currentToken = tokenData.token;
 
         document.getElementById('active-email').innerText = currentEmail;
 
-        // Save session in local browser storage
         localStorage.setItem('temp_mail_data', JSON.stringify({
           email: currentEmail,
           password: currentPassword,
-          token: currentToken
+          token: currentToken,
+          apiBase: activeBase
         }));
 
         startPolling();
+
       } catch (err) {
-        console.error("API Error:", err);
-        document.getElementById('active-email').innerText = "Failed to create mail! Tap Refresh.";
+        console.error("Mail Creation Error:", err);
+        document.getElementById('active-email').innerText = "Failed! Tap Change to retry.";
       }
     }
 
     async function checkInbox() {
       if (!currentToken) return;
       try {
-        let res = await fetch("https://api.mail.tm/messages", {
+        let res = await fetch(`${activeBase}/messages`, {
           headers: { "Authorization": "Bearer " + currentToken }
         });
         if (!res.ok) return;
@@ -676,7 +676,6 @@
       let subject = msg.subject || "(No Subject)";
       let intro = msg.intro || "(No preview available)";
 
-      // Highlight 4 to 8 digit OTP codes automatically
       let otpMatch = (subject + " " + intro).match(/\b\d{4,8}\b/);
       let otpBadgeHTML = otpMatch ? `<div class="otp-badge">Code: ${otpMatch[0]}</div>` : '';
 
@@ -706,7 +705,7 @@
       document.getElementById('mail-modal').classList.add('show');
 
       try {
-        let res = await fetch(`https://api.mail.tm/messages/${msgId}`, {
+        let res = await fetch(`${activeBase}/messages/${msgId}`, {
           headers: { "Authorization": "Bearer " + currentToken }
         });
         let data = await res.json();
@@ -762,7 +761,6 @@
       }
     }
 
-    // Pass data directly to Telegram WebApp and BJS script
     function submitSaveData() {
       let platform = document.getElementById('save-platform').value;
       let username = document.getElementById('save-username').value.trim();
@@ -771,8 +769,8 @@
       let payload = {
         action: "save_temp_mail",
         email: currentEmail,
-        token: currentToken, // 👈 BJS-এর জন্য নিখুঁত বিয়ারার টোকেন পাঠানো হচ্ছে
-        password: currentPassword, // 👈 মেল পাসওয়ার্ড
+        token: currentToken,
+        password: currentPassword,
         platform: platform,
         username: username || "N/A",
         platformPassword: platformPassword || "N/A",
@@ -782,7 +780,7 @@
       if (tg && tg.sendData) {
         tg.sendData(JSON.stringify(payload));
       } else {
-        alert("Token & Email Payload Created!\nSend Data payload:\n" + JSON.stringify(payload, null, 2));
+        alert("BJS Send Data Payload:\n" + JSON.stringify(payload, null, 2));
       }
       closeSaveModal();
     }
