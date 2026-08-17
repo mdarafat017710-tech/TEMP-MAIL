@@ -45,7 +45,6 @@
       gap: 16px;
     }
 
-    /* Top Navigation Bar */
     .top-nav {
       display: flex;
       justify-content: space-between;
@@ -80,7 +79,6 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Active Email Box Card */
     .mail-card {
       background: var(--card-bg);
       border-radius: 16px;
@@ -125,7 +123,6 @@
       100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
     }
 
-    /* Email Box & Copy Button Row */
     .email-display-row {
       display: flex;
       align-items: center;
@@ -166,7 +163,6 @@
       background: var(--accent-green) !important;
     }
 
-    /* Control Buttons Row */
     .controls-row {
       display: flex;
       gap: 10px;
@@ -206,7 +202,6 @@
       justify-content: center;
     }
 
-    /* Inbox Section */
     .inbox-section {
       display: flex;
       flex-direction: column;
@@ -240,7 +235,6 @@
       font-size: 14px;
     }
 
-    /* Email List Items (Gmail Style) */
     .mail-item {
       padding: 14px 16px;
       display: flex;
@@ -330,7 +324,6 @@
       width: fit-content;
     }
 
-    /* Modal for Email Detail & Save Modal */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -411,7 +404,6 @@
       background: #f8f8fa;
     }
 
-    /* Toast Notification */
     #copy-toast {
       position: fixed;
       top: -60px;
@@ -436,7 +428,6 @@
 </head>
 <body>
 
-  <!-- Copy Toast Notification -->
   <div id="copy-toast">
     <div style="width: 16px; height: 16px; background: var(--accent-green); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -446,7 +437,6 @@
 
   <div class="app-container">
     
-    <!-- Top Navigation -->
     <div class="top-nav">
       <h1 class="nav-title">Temp Mail</h1>
       <div class="refresh-badge" onclick="manualRefresh()">
@@ -455,7 +445,6 @@
       </div>
     </div>
 
-    <!-- Active Email Card -->
     <div class="mail-card">
       <div class="card-header">
         <span>Active Temporary Address</span>
@@ -487,7 +476,6 @@
       </div>
     </div>
 
-    <!-- Inbox List Section -->
     <div class="inbox-section">
       <span class="section-title">Inbox Messages</span>
       <div class="inbox-card" id="inbox-container">
@@ -500,7 +488,6 @@
 
   </div>
 
-  <!-- Save Modal (Telegram WebApp Integration) -->
   <div class="modal-overlay" id="save-modal">
     <div class="modal-sheet">
       <div class="modal-header">
@@ -530,7 +517,6 @@
     </div>
   </div>
 
-  <!-- Mail View Modal -->
   <div class="modal-overlay" id="mail-modal">
     <div class="modal-sheet">
       <div class="modal-header">
@@ -543,17 +529,19 @@
   </div>
 
   <script>
-    // Initialize Telegram WebApp
     const tg = window.Telegram ? window.Telegram.WebApp : null;
     if (tg) tg.ready();
 
+    // Fallback Dual Endpoints (mail.tm & mail.gw)
+    const API_SERVERS = ["https://api.mail.tm", "https://api.mail.gw"];
+    let activeApiBase = API_SERVERS[0];
+
     let currentEmail = "";
-    let currentPassword = "InternalPass123!";
+    let currentPassword = "";
     let currentToken = "";
     let fetchedMessageIds = new Set();
     let pollTimer = null;
 
-    // Load or Create Email on Start
     window.addEventListener('DOMContentLoaded', async () => {
       let saved = localStorage.getItem('temp_mail_data');
       if (saved) {
@@ -562,6 +550,7 @@
           currentEmail = parsed.email;
           currentPassword = parsed.password;
           currentToken = parsed.token;
+          activeApiBase = parsed.apiBase || API_SERVERS[0];
           document.getElementById('active-email').innerText = currentEmail;
           startPolling();
           return;
@@ -580,54 +569,77 @@
         </div>`;
       fetchedMessageIds.clear();
 
-      try {
-        // Step 1: Fetch domains
-        let domRes = await fetch("https://api.mail.tm/domains");
-        let domData = await domRes.json();
-        let domain = domData["hydra:member"][0].domain;
+      // Loop through fallback API servers
+      for (let baseUrl of API_SERVERS) {
+        try {
+          // Step 1: Fetch domains
+          let domRes = await fetch(`${baseUrl}/domains`);
+          if (!domRes.ok) continue;
+          let domData = await domRes.json();
+          let domainList = domData["hydra:member"] || [];
+          if (domainList.length === 0) continue;
 
-        // Step 2: Generate random username
-        let chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-        let rand = "temp_";
-        for (let i = 0; i < 8; i++) rand += chars.charAt(Math.floor(Math.random() * chars.length));
-        
-        currentEmail = rand + "@" + domain;
+          // Pick domain
+          let domain = domainList[Math.floor(Math.random() * domainList.length)].domain;
 
-        // Step 3: Create Account
-        await fetch("https://api.mail.tm/accounts", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address: currentEmail, password: currentPassword })
-        });
+          // Step 2: Create Random User & Password
+          let chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+          let randUser = "user_";
+          for (let i = 0; i < 8; i++) randUser += chars.charAt(Math.floor(Math.random() * chars.length));
+          
+          let email = randUser + "@" + domain;
+          let password = "P1@" + Math.random().toString(36).substring(2, 10);
 
-        // Step 4: Get Token
-        let tokenRes = await fetch("https://api.mail.tm/token", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address: currentEmail, password: currentPassword })
-        });
-        let tokenData = await tokenRes.json();
-        currentToken = tokenData.token;
+          // Step 3: Create Account
+          let accRes = await fetch(`${baseUrl}/accounts`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ address: email, password: password })
+          });
 
-        document.getElementById('active-email').innerText = currentEmail;
+          if (!accRes.ok && accRes.status !== 409) continue;
 
-        // Save session locally
-        localStorage.setItem('temp_mail_data', JSON.stringify({
-          email: currentEmail, password: currentPassword, token: currentToken
-        }));
+          // Step 4: Fetch Token
+          let tokenRes = await fetch(`${baseUrl}/token`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ address: email, password: password })
+          });
 
-        startPolling();
-      } catch (err) {
-        document.getElementById('active-email').innerText = "Failed to create mail!";
+          if (!tokenRes.ok) continue;
+          let tokenData = await tokenRes.json();
+          if (!tokenData.token) continue;
+
+          // Success set values
+          activeApiBase = baseUrl;
+          currentEmail = email;
+          currentPassword = password;
+          currentToken = tokenData.token;
+
+          document.getElementById('active-email').innerText = currentEmail;
+
+          localStorage.setItem('temp_mail_data', JSON.stringify({
+            email: currentEmail, password: currentPassword, token: currentToken, apiBase: activeApiBase
+          }));
+
+          startPolling();
+          return; // Exit function successfully
+        } catch (err) {
+          console.warn("Retrying with fallback server due to:", err);
+        }
       }
+
+      document.getElementById('active-email').innerText = "Failed to create mail!";
     }
 
     async function checkInbox() {
-      if (!currentToken) return;
+      if (!currentToken || !activeApiBase) return;
       try {
-        let res = await fetch("https://api.mail.tm/messages", {
+        let res = await fetch(`${activeApiBase}/messages`, {
           headers: { "Authorization": "Bearer " + currentToken }
         });
+        if (!res.ok) return;
+
         let data = await res.json();
         let messages = data["hydra:member"] || [];
 
@@ -653,7 +665,6 @@
       let subject = msg.subject || "(No Subject)";
       let intro = msg.intro || "(No preview available)";
 
-      // Extract verification codes/OTPs
       let otpMatch = (subject + " " + intro).match(/\b\d{4,8}\b/);
       let otpBadgeHTML = otpMatch ? `<div class="otp-badge">Code: ${otpMatch[0]}</div>` : '';
 
@@ -683,7 +694,7 @@
       document.getElementById('mail-modal').classList.add('show');
 
       try {
-        let res = await fetch(`https://api.mail.tm/messages/${msgId}`, {
+        let res = await fetch(`${activeApiBase}/messages/${msgId}`, {
           headers: { "Authorization": "Bearer " + currentToken }
         });
         let data = await res.json();
@@ -721,7 +732,6 @@
       });
     }
 
-    // Modal & BJS Sync Handler
     function openSaveModal() {
       document.getElementById('save-modal').classList.add('show');
     }
