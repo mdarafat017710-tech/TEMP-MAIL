@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Temp Mail</title>
+  <title>Temp Mail Generator</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
@@ -18,15 +18,7 @@
       --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: var(--font-family);
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      -webkit-user-select: none;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); -webkit-tap-highlight-color: transparent; user-select: none; }
 
     body {
       background-color: var(--bg-color);
@@ -41,273 +33,72 @@
 
     /* Toast Notification */
     #toast {
-      position: fixed;
-      top: -60px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      color: #ffffff;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-      transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
-      opacity: 0;
-      z-index: 9999;
+      position: fixed; top: -60px; left: 50%; transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      color: #ffffff; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500;
+      display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease; opacity: 0; z-index: 9999;
     }
+    #toast.show { top: 14px; opacity: 1; }
+    #toast .toast-icon { background: var(--accent-green); width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
-    #toast.show {
-      top: 14px;
-      opacity: 1;
-    }
-
-    #toast .toast-icon {
-      background: var(--accent-green);
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* Top Title */
-    .header-title {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      letter-spacing: -0.4px;
-    }
-
-    /* Main Container Card */
-    .container {
-      width: 100%;
-      max-width: 420px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    /* Single Box Item Style */
-    .info-box-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .box-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      letter-spacing: 0.3px;
-      padding-left: 4px;
-    }
-
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-      width: 100%;
-    }
+    .header-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; letter-spacing: -0.4px; }
+    .container { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 16px; }
+    .info-box-group { display: flex; flex-direction: column; gap: 6px; }
+    .box-label { font-size: 12px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.3px; padding-left: 4px; }
+    .input-wrapper { position: relative; display: flex; align-items: center; width: 100%; }
 
     /* Green Glowing Box */
     .ios-box {
-      width: 100%;
-      padding: 12px 44px 12px 14px;
-      background: var(--card-bg);
-      border: 1.5px solid var(--accent-green);
-      border-radius: 12px;
-      font-size: 15px;
-      font-family: monospace, var(--font-family);
-      color: var(--text-main);
-      outline: none;
-      box-shadow: 0 0 10px rgba(52, 199, 89, 0.25), 0 2px 6px rgba(52, 199, 89, 0.15);
-      transition: all 0.3s ease;
-      user-select: text;
-      -webkit-user-select: text;
+      width: 100%; padding: 12px 44px 12px 14px; background: var(--card-bg);
+      border: 1.5px solid var(--accent-green); border-radius: 12px; font-size: 15px; font-weight: 500;
+      color: var(--text-main); outline: none; box-shadow: 0 0 10px rgba(52, 199, 89, 0.25), 0 2px 6px rgba(52, 199, 89, 0.15);
+      transition: all 0.3s ease; user-select: text; -webkit-user-select: text;
     }
+    .ios-box:focus { box-shadow: 0 0 14px rgba(52, 199, 89, 0.4), 0 2px 8px rgba(52, 199, 89, 0.2); }
 
-    .ios-box:focus {
-      box-shadow: 0 0 14px rgba(52, 199, 89, 0.4), 0 2px 8px rgba(52, 199, 89, 0.2);
-    }
-
-    /* Copy Button inside Box */
+    /* Copy Button */
     .box-copy-btn {
-      position: absolute;
-      right: 10px;
-      width: 28px;
-      height: 28px;
-      background: #f0f0f5;
-      color: var(--accent-blue);
-      border: none;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-      transition: background 0.2s ease, color 0.2s ease;
+      position: absolute; right: 10px; width: 28px; height: 28px; background: #f0f0f5; color: var(--accent-blue);
+      border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); transition: background 0.2s ease, color 0.2s ease;
     }
-
-    .box-copy-btn.copied {
-      background: var(--accent-green) !important;
-      color: #ffffff !important;
-    }
+    .box-copy-btn.copied { background: var(--accent-green) !important; color: #ffffff !important; }
 
     /* Action Buttons Area */
-    .action-container {
-      width: 100%;
-      max-width: 420px;
-      margin-top: 14px;
-      display: flex;
-      gap: 12px;
-    }
-
+    .action-container { width: 100%; max-width: 420px; margin-top: 14px; display: flex; gap: 12px; }
     .btn-action {
-      flex: 1;
-      background: var(--accent-blue);
-      color: #ffffff;
-      border: none;
-      padding: 14px;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
-      transition: opacity 0.2s ease;
+      flex: 1; background: var(--accent-blue); color: #ffffff; border: none; padding: 14px; border-radius: 12px;
+      font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25); transition: opacity 0.2s ease;
     }
+    .btn-save { background: var(--accent-purple); box-shadow: 0 4px 12px rgba(88, 86, 214, 0.25); }
+    .btn-action:active { opacity: 0.8; }
+    .btn-content { display: flex; align-items: center; gap: 8px; }
 
-    .btn-save {
-      background: var(--accent-purple);
-      box-shadow: 0 4px 12px rgba(88, 86, 214, 0.25);
-    }
-
-    .btn-action:active {
-      opacity: 0.8;
-    }
-
-    .btn-content {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* iOS Spinner Animation */
-    .ios-spinner {
-      display: none;
-      width: 20px;
-      height: 20px;
-      animation: iosRotate 0.8s steps(8, end) infinite;
-    }
-
-    @keyframes iosRotate {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    /* iOS Spinner */
+    .ios-spinner { display: none; width: 20px; height: 20px; animation: iosRotate 0.8s steps(8, end) infinite; }
+    @keyframes iosRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     /* Inbox Section */
-    .inbox-wrapper {
-      width: 100%;
-      max-width: 420px;
-      margin-top: 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+    .inbox-wrapper { width: 100%; max-width: 420px; margin-top: 22px; display: flex; flex-direction: column; gap: 8px; }
+    .inbox-card { background: var(--card-bg); border-radius: 14px; border: 1px solid rgba(0,0,0,0.06); overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .empty-inbox { padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 13.5px; }
+    .msg-item { padding: 12px 14px; border-bottom: 1px solid #e5e5ea; cursor: pointer; transition: background 0.15s ease; }
+    .msg-item:last-child { border-bottom: none; }
+    .msg-item:active { background: #f2f2f7; }
+    .msg-from { font-size: 13.5px; font-weight: 600; color: var(--text-main); }
+    .msg-subj { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    .inbox-card {
-      background: var(--card-bg);
-      border-radius: 14px;
-      border: 1px solid rgba(0,0,0,0.06);
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-    }
-
-    .empty-inbox {
-      padding: 24px 16px;
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 13.5px;
-    }
-
-    .msg-item {
-      padding: 12px 14px;
-      border-bottom: 1px solid #e5e5ea;
-      cursor: pointer;
-      transition: background 0.15s ease;
-    }
-
-    .msg-item:last-child {
-      border-bottom: none;
-    }
-
-    .msg-item:active {
-      background: #f2f2f7;
-    }
-
-    .msg-from {
-      font-size: 13.5px;
-      font-weight: 600;
-      color: var(--text-main);
-    }
-
-    .msg-subj {
-      font-size: 12.5px;
-      color: var(--text-muted);
-      margin-top: 2px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    /* Modal Sheet for Message View */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(8px);
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-      z-index: 999;
-    }
-
+    /* Modal for Reading Mail */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); display: none; align-items: flex-end; justify-content: center; z-index: 999; }
     .modal-overlay.show { display: flex; }
-
-    .modal-sheet {
-      background: var(--card-bg);
-      width: 100%;
-      max-width: 420px;
-      border-top-left-radius: 20px;
-      border-top-right-radius: 20px;
-      padding: 20px;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 10px;
-      margin-bottom: 12px;
-    }
+    .modal-sheet { background: var(--card-bg); width: 100%; max-width: 420px; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; max-height: 80vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 12px; }
   </style>
 </head>
 <body onload="initMail()">
 
-  <!-- Toast Notification -->
   <div id="toast">
     <div class="toast-icon">
       <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
@@ -320,11 +111,11 @@
   <h1 class="header-title">Temp Mail Generator</h1>
 
   <div class="container">
-    <!-- Single Temporary Email Box -->
     <div class="info-box-group">
       <label class="box-label">Temporary Email Address</label>
       <div class="input-wrapper">
-        <input type="text" id="email-box" class="ios-box" readonly placeholder="Generating email...">
+        <!-- Default value changed so it's clear what's happening -->
+        <input type="text" id="email-box" class="ios-box" readonly placeholder="Connecting to server...">
         <button class="box-copy-btn" onclick="copyValue('email-box', this)" title="Copy Email">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
         </button>
@@ -332,14 +123,11 @@
     </div>
   </div>
 
-  <!-- Action Buttons -->
   <div class="action-container">
     <button class="btn-action" id="random-btn" onclick="triggerChangeWithLoading()">
       <div class="btn-content" id="btn-inner">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M23 4v6h-6"></path>
-          <path d="M1 20v-6h6"></path>
-          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          <path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
         </svg>
         <span>Change</span>
       </div>
@@ -358,16 +146,13 @@
     <button class="btn-action btn-save" onclick="saveMailData()">
       <div class="btn-content">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-          <polyline points="17 21 17 13 7 13 7 21"></polyline>
-          <polyline points="7 3 7 8 15 8"></polyline>
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline>
         </svg>
         <span>Save</span>
       </div>
     </button>
   </div>
 
-  <!-- Inbox Section -->
   <div class="inbox-wrapper">
     <label class="box-label">Inbox Messages</label>
     <div class="inbox-card" id="inbox-container">
@@ -375,7 +160,6 @@
     </div>
   </div>
 
-  <!-- Mail View Modal -->
   <div class="modal-overlay" id="mail-modal">
     <div class="modal-sheet">
       <div class="modal-header">
@@ -391,7 +175,7 @@
     const tg = window.Telegram ? window.Telegram.WebApp : null;
     if (tg) tg.ready();
 
-    const INTERNAL_PASS = "InternalPass123!";
+    const INTERNAL_PASS = "Pass123!XYZ"; // Strong internal password
     const copyIconSVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
     const copiedCheckSVG = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
 
@@ -410,68 +194,81 @@
 
     function copyValue(elementId, btnElement) {
       const val = document.getElementById(elementId).value;
-      if (!val) return;
+      if (!val || val.includes("Error") || val.includes("Generating")) return;
       navigator.clipboard.writeText(val).then(() => {
         btnElement.classList.add('copied');
         btnElement.innerHTML = copiedCheckSVG;
         showToast();
-        setTimeout(() => {
-          btnElement.classList.remove('copied');
-          btnElement.innerHTML = copyIconSVG;
-        }, 2000);
+        setTimeout(() => { btnElement.classList.remove('copied'); btnElement.innerHTML = copyIconSVG; }, 2000);
       });
     }
 
+    // Underscore বাদ দিয়েছি, শুধু লেটার ও নাম্বার (API error এড়ানোর জন্য)
     function generateRandomUsername() {
       const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-      let res = "temp_";
-      for (let i = 0; i < 8; i++) {
-        res += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
+      let res = "user"; 
+      for (let i = 0; i < 7; i++) { res += chars.charAt(Math.floor(Math.random() * chars.length)); }
       return res;
     }
 
+    // ফুলপ্রুফ API কল উইথ Error Handling
     async function initMail() {
+      const emailBox = document.getElementById('email-box');
+      emailBox.value = "Generating email...";
+
       if (pollInterval) clearInterval(pollInterval);
       document.getElementById('inbox-container').innerHTML = '<div class="empty-inbox">Waiting for incoming messages...</div>';
 
       try {
-        // Step 1: BJS Domain Logic (API-র প্রথম ডোমেইন domains[0].domain)
-        let domRes = await fetch("https://api.mail.tm/domains");
+        // Step 1: Fetch Domain
+        let domRes = await fetch("https://api.mail.tm/domains", { headers: { "Accept": "application/json" } });
+        if (!domRes.ok) throw new Error("Domain Fetch failed: " + domRes.status);
         let domData = await domRes.json();
+        
+        if (!domData["hydra:member"] || domData["hydra:member"].length === 0) {
+            throw new Error("No domains available.");
+        }
         let domain = domData["hydra:member"][0].domain;
 
-        // Step 2: Username & Email Generation
+        // Step 2: Generate Details
         currentUsername = generateRandomUsername();
         currentEmail = `${currentUsername}@${domain}`;
 
-        // Step 3: Register Temp Account
-        await fetch("https://api.mail.tm/accounts", {
+        // Step 3: Register Account
+        let accRes = await fetch("https://api.mail.tm/accounts", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
           body: JSON.stringify({ address: currentEmail, password: INTERNAL_PASS })
         });
+        
+        if (!accRes.ok) {
+          let errTxt = await accRes.text();
+          throw new Error("API Blocked Creation: " + accRes.status);
+        }
 
-        // Step 4: Get Token
+        // Step 4: Fetch Token
         let tokenRes = await fetch("https://api.mail.tm/token", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
           body: JSON.stringify({ address: currentEmail, password: INTERNAL_PASS })
         });
+        if (!tokenRes.ok) throw new Error("Token Error: " + tokenRes.status);
 
         let tokenData = await tokenRes.json();
         currentToken = tokenData.token;
 
-        // Set value in the single email box
-        document.getElementById('email-box').value = currentEmail;
-
-        // Start Inbox Polling
+        // Success - Set Data to UI
+        emailBox.value = currentEmail;
         startPolling();
+
       } catch (err) {
-        console.error("Mail creation error:", err);
+        console.error("Mail Creation Error:", err);
+        // যদি ফেইল করে, বক্সের ভেতরেই এরর দেখাবে, আটকে থাকবে না!
+        emailBox.value = "Error: " + err.message;
       }
     }
 
+    // Change Button - 1 Second Loading Animation
     function triggerChangeWithLoading() {
       const btn = document.getElementById('random-btn');
       const innerContent = document.getElementById('btn-inner');
@@ -481,7 +278,6 @@
       spinner.style.display = 'inline-block';
       btn.disabled = true;
 
-      // Exactly 1-second iOS Spinner loading animation
       setTimeout(async () => {
         await initMail();
         spinner.style.display = 'none';
@@ -490,8 +286,12 @@
       }, 1000);
     }
 
+    // Save Button - Payload এ শুধুমাত্র (Email, Username, Password)
     function saveMailData() {
-      // Save Payload according to BJS setup
+      if (!currentEmail || currentEmail.includes("Error")) {
+          alert("No valid email to save!");
+          return;
+      }
       let payload = {
         email: currentEmail,
         username: currentUsername,
@@ -501,17 +301,19 @@
       if (tg && tg.sendData) {
         tg.sendData(JSON.stringify(payload));
       } else {
-        alert("Payload sent:\n" + JSON.stringify(payload, null, 2));
+        alert("Payload Data Sent to Bot:\n\n" + JSON.stringify(payload, null, 2));
       }
     }
 
+    // Inbox Polling
     function startPolling() {
       pollInterval = setInterval(async () => {
         if (!currentToken) return;
         try {
           let res = await fetch("https://api.mail.tm/messages", {
-            headers: { "Authorization": "Bearer " + currentToken }
+            headers: { "Authorization": "Bearer " + currentToken, "Accept": "application/json" }
           });
+          if(!res.ok) return;
           let data = await res.json();
           let msgs = data["hydra:member"] || [];
 
@@ -522,10 +324,7 @@
               let item = document.createElement('div');
               item.className = 'msg-item';
               item.onclick = () => openMessage(m.id, m.subject, m.from.address);
-              item.innerHTML = `
-                <div class="msg-from">${m.from.address}</div>
-                <div class="msg-subj">${m.subject || '(No Subject)'}</div>
-              `;
+              item.innerHTML = `<div class="msg-from">${m.from.address}</div><div class="msg-subj">${m.subject || '(No Subject)'}</div>`;
               container.appendChild(item);
             });
           }
@@ -541,8 +340,9 @@
 
       try {
         let res = await fetch(`https://api.mail.tm/messages/${msgId}`, {
-          headers: { "Authorization": "Bearer " + currentToken }
+          headers: { "Authorization": "Bearer " + currentToken, "Accept": "application/json" }
         });
+        if(!res.ok) throw new Error();
         let data = await res.json();
         document.getElementById('view-body').innerHTML = data.html ? data.html[0] : (data.text || "No Content");
       } catch(e) {
@@ -550,9 +350,7 @@
       }
     }
 
-    function closeModal() {
-      document.getElementById('mail-modal').classList.remove('show');
-    }
+    function closeModal() { document.getElementById('mail-modal').classList.remove('show'); }
   </script>
 </body>
 </html>
