@@ -484,6 +484,7 @@
 
   </div>
 
+  <!-- Save Modal -->
   <div class="modal-overlay" id="save-modal">
     <div class="modal-sheet">
       <div class="modal-header">
@@ -513,6 +514,7 @@
     </div>
   </div>
 
+  <!-- Mail View Modal -->
   <div class="modal-overlay" id="mail-modal">
     <div class="modal-sheet">
       <div class="modal-header">
@@ -529,10 +531,10 @@
     if (tg) tg.ready();
 
     const API_SERVERS = ["https://api.mail.tm", "https://api.mail.gw"];
-    let activeApiBase = API_SERVERS[0];
+    const INTERNAL_PASS = "InternalPass123!"; // BJS ফিক্সড ইন্টারনাল পাসওয়ার্ড
 
+    let activeApiBase = API_SERVERS[0];
     let currentEmail = "";
-    let currentPassword = "";
     let currentToken = "";
     let fetchedMessageIds = new Set();
     let pollTimer = null;
@@ -543,7 +545,6 @@
         try {
           let parsed = JSON.parse(saved);
           currentEmail = parsed.email;
-          currentPassword = parsed.password;
           currentToken = parsed.token;
           activeApiBase = parsed.apiBase || API_SERVERS[0];
           document.getElementById('active-email').innerText = currentEmail;
@@ -554,7 +555,7 @@
       await createNewMail();
     });
 
-    // Random string generator for temp_ prefix
+    // 8 অক্ষরের র্যান্ডম ইউজারনেম জেনারেটর (temp_ প্রিফিক্স সহ)
     function generateRandomUser() {
       const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
       let result = "temp_";
@@ -576,67 +577,62 @@
 
       for (let baseUrl of API_SERVERS) {
         try {
-          // 1. Fetch available domains
+          // ১. ডাইনামিক ডোমেইন ফেচ করা (BJS Step 1)
           let domRes = await fetch(`${baseUrl}/domains`);
           if (!domRes.ok) continue;
           let domData = await domRes.json();
           let domainList = domData["hydra:member"] || [];
           if (domainList.length === 0) continue;
 
-          // 2. Select domain ending with emalupe.com or target domain
-          let targetDomainObj = domainList.find(d => d.domain.toLowerCase().includes("emalupe")) || 
-                                domainList.find(d => d.domain.toLowerCase() === "emalupe.com") || 
-                                domainList[0];
-          
-          let domain = targetDomainObj.domain;
+          // প্রথম সক্রিয় ডোমেইনটি পিক করবে (domains[0].domain)
+          let domain = domainList[0].domain;
 
-          // 3. Create temp_xxxxxxxx prefix email and strict password format
+          // ২. temp_xxxxxxxx ফরম্যাটে ইমেইল তৈরি (BJS Step 2)
           let randUser = generateRandomUser();
           let email = `${randUser}@${domain}`;
-          let password = "P1@" + Math.random().toString(36).substring(2, 10) + "Aa";
 
-          // 4. Register Account
+          // ৩. অ্যাকাউন্ট রেজিস্টার করা (BJS Step 2: InternalPass123!)
           let accRes = await fetch(`${baseUrl}/accounts`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ address: email, password: password })
+            body: JSON.stringify({ address: email, password: INTERNAL_PASS })
           });
 
           if (!accRes.ok && accRes.status !== 409) continue;
 
-          // 5. Get Bearer Token
+          // ৪. Bearer Token গেট করা (BJS Step 3)
           let tokenRes = await fetch(`${baseUrl}/token`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ address: email, password: password })
+            body: JSON.stringify({ address: email, password: INTERNAL_PASS })
           });
 
           if (!tokenRes.ok) continue;
           let tokenData = await tokenRes.json();
           if (!tokenData.token) continue;
 
-          // Store details on success
+          // সফল হলে স্টেট আপডেট ও সেভ
           activeApiBase = baseUrl;
           currentEmail = email;
-          currentPassword = password;
           currentToken = tokenData.token;
 
           document.getElementById('active-email').innerText = currentEmail;
 
           localStorage.setItem('temp_mail_data', JSON.stringify({
-            email: currentEmail, password: currentPassword, token: currentToken, apiBase: activeApiBase
+            email: currentEmail, token: currentToken, apiBase: activeApiBase
           }));
 
           startPolling();
           return;
         } catch (err) {
-          console.warn("Domain creation error:", err);
+          console.warn("API Error:", err);
         }
       }
 
       document.getElementById('active-email').innerText = "Failed to create mail!";
     }
 
+    // ইনবক্সের মেসেজ ফেচ ও চেক করা (BJS Step 4)
     async function checkInbox() {
       if (!currentToken || !activeApiBase) return;
       try {
@@ -764,7 +760,7 @@
         action: "save_temp_mail",
         email: currentEmail,
         token: currentToken,
-        password: currentPassword,
+        password: INTERNAL_PASS,
         platform: platform,
         username: username || "N/A",
         platformPassword: platformPassword || "N/A",
