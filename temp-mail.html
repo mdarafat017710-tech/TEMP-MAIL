@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TEMP MAIL - Premium iOS Dashboard</title>
+    <title>Temp Mail Generator</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #f2f2f7;          
@@ -15,8 +14,8 @@
             --text-dark: #1c1c1e;   
             --text-muted: #8e8e93;  
             --success: #34c759;     
-            --danger: #ff3b30;    
             --primary: #007aff;     
+            --error: #ff3b30;
             --font: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
         }
 
@@ -30,84 +29,274 @@
 
         body { 
             background-color: var(--bg); 
-            padding: 20px 14px; 
+            padding: 16px; 
             color: var(--text-dark);
             -webkit-font-smoothing: antialiased;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
             user-select: none;
             -webkit-user-select: none;
         }
 
-        .page-title {
-            text-align: center;
-            font-size: 20px;
-            font-weight: 800;
-            color: #000000;
-            margin-bottom: 16px;
-            letter-spacing: -0.5px;
+        .wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            max-width: 400px;
+            animation: pageFade 0.3s ease-out;
         }
 
-        /* 🔍 সার্চ বক্স */
-        .search-wrapper {
+        @keyframes pageFade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .brand-header {
             display: flex;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 4px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 16px; 
+            margin-top: 5px;
+        }
+        h1.brand-title { 
+            font-size: 23px; 
+            font-weight: 700; 
+            color: #000000; 
+            letter-spacing: -0.3px;
+        }
+
+        .section-label { 
+            font-size: 13px; 
+            font-weight: 500; 
+            color: var(--text-muted); 
+            text-align: left; 
+            margin-bottom: 4px; 
+            padding-left: 2px; 
         }
         
-        .premium-search-icon {
-            margin-left: 12px;
-            margin-right: 2px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+        .input-card {
+            width: 100%; 
+            background: var(--card); 
+            border: 1px solid var(--success); 
+            border-radius: 10px;
+            position: relative; 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 16px; 
+            box-shadow: 0 1px 4px rgba(52, 199, 89, 0.02);
         }
 
-        .search-input {
-            flex: 1;
-            border: none;
-            outline: none;
-            padding: 8px 10px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-dark);
-            background: transparent;
+        .field-input { 
+            width: 100%; 
+            padding: 12px 14px; 
+            border: none; 
+            outline: none; 
+            font-size: 14px; 
+            font-weight: 500; 
+            color: #1c1c1e; 
+            background: transparent; 
             user-select: text;
             -webkit-user-select: text;
         }
-        .search-input::placeholder { color: var(--text-muted); }
+
+        .inline-copy-btn {
+            width: 30px; 
+            height: 30px; 
+            border-radius: 50%; 
+            border: 1px solid var(--border);
+            background: #ffffff; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            cursor: pointer; 
+            transition: all 0.15s ease; 
+            flex-shrink: 0;
+            margin-right: 10px; 
+        }
+        .inline-copy-btn svg { width: 12px; height: 12px; fill: #b5b5b9; }
+        .inline-copy-btn:active { transform: scale(0.92); background: #f2f2f7; }
+        .inline-copy-btn.copied { background: var(--success) !important; border-color: var(--success) !important; }
+        .inline-copy-btn.copied svg { fill: #fff !important; }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            margin-top: 6px;
+            margin-bottom: 20px;
+        }
+
+        .proceed-btn {
+            flex: 1;
+            padding: 14px; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 15px; 
+            font-weight: 600;
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            gap: 8px; 
+            min-height: 49px; 
+        }
         
-        .search-btn {
-            background: var(--primary);
-            color: #ffffff;
+        .btn-change { 
+            background: var(--primary); 
+            color: #fff; 
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.12);
+        }
+        .btn-change:active { transform: scale(0.98); opacity: 0.95; }
+        .btn-change:disabled { background: #a2caff !important; cursor: not-allowed; box-shadow: none; }
+        
+        .btn-save { 
+            background: var(--success); 
+            color: #fff; 
+            box-shadow: 0 4px 12px rgba(52, 199, 89, 0.12);
+        }
+        .btn-save:active { transform: scale(0.98); opacity: 0.95; }
+        .btn-save:disabled { background: #a3e6b5 !important; cursor: not-allowed; box-shadow: none; }
+
+        .btn-icon { width: 16px; height: 16px; fill: #ffffff; display: block; }
+        .btn-spinner { display: none; width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.55s linear infinite; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* 📥 ইনবক্স ডিজাইন */
+        .inbox-section {
+            margin-top: 10px;
+            border-top: 2px dashed var(--border);
+            padding-top: 16px;
+            animation: iosPop 0.3s cubic-bezier(0.1, 0.8, 0.25, 1);
+        }
+        .inbox-title-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        
+        .inbox-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .live-indicator {
+            width: 9px;
+            height: 9px;
+            background-color: var(--success);
+            border-radius: 50%;
+            position: relative;
+            display: inline-block;
+            box-shadow: 0 0 8px var(--success);
+            animation: pulseSignal 1.5s infinite ease-in-out;
+        }
+        @keyframes pulseSignal {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(52, 199, 89, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
+        }
+
+        .inbox-title-bar h3 {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.3px;
+        }
+        .refresh-inbox-btn {
+            background: #e5e5ea;
+            color: #48484a;
             border: none;
-            outline: none;
-            height: 32px;
-            padding: 0 14px;
-            border-radius: 10px;
+            padding: 5px 12px;
+            border-radius: 20px;
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
-            transition: opacity 0.2s;
-            display: flex; align-items: center; justify-content: center;
-            min-width: 68px;
+            transition: background 0.2s;
         }
-        .search-btn:active { opacity: 0.8; }
-        
-        .spinner {
-            width: 16px; height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: #ffffff;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .refresh-inbox-btn:active { background: #d1d1d6; }
 
-        /* 👑 কালারফুল প্রিমিয়াম iOS রিভলভিং লোডার */
+        .mail-item {
+            background: var(--card);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 14px;
+            border: 1px solid var(--border);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.015);
+            animation: iosPop 0.25s ease;
+        }
+        
+        .mail-header-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .sender-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+            border: 1px solid rgba(0, 122, 255, 0.15);
+        }
+        
+        .mail-meta {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            flex: 1;
+            overflow: hidden;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+        .mail-meta span {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .mail-subject { 
+            font-size: 14px; 
+            font-weight: 700; 
+            color: #000000; 
+            margin-bottom: 12px; 
+            line-height: 1.4; 
+            user-select: text !important;
+            -webkit-user-select: text !important;
+        }
+
+        .mail-html-viewport {
+            border-top: 1px solid #f2f2f7;
+            padding-top: 12px;
+            overflow: hidden;
+            width: 100%;
+        }
+        .mail-iframe {
+            width: 100%;
+            height: 60px; 
+            border: 1px solid #e5e5ea;
+            background: #ffffff;
+            border-radius: 8px;
+            display: block;
+            transition: height 0.2s ease; 
+        }
+        
+        /* 👑 Premium iOS Loader */
         .premium-ios-loader {
             display: flex;
             flex-direction: column;
@@ -164,934 +353,630 @@
             from { opacity: 0.6; }
             to { opacity: 1; }
         }
-        
-        /* 🍏 iOS Shimmer Loader */
-        .skeleton-card {
-            background: var(--card); border-radius: 20px; padding: 16px;
-            margin-bottom: 14px; border: 1px solid rgba(0, 0, 0, 0.03);
-        }
-        .skeleton-line {
-            height: 14px; margin-bottom: 12px; border-radius: 6px;
-            background: linear-gradient(90deg, #e5e5ea 25%, #f2f2f7 50%, #e5e5ea 75%);
-            background-size: 200% 100%; animation: shimmer 1.4s infinite linear;
-        }
-        .skeleton-line.short { width: 35%; height: 12px; }
-        .skeleton-line.long { width: 100%; }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-        /* 👑 iOS নোটিফিকেশন টোস্ট */
+        @keyframes iosPop {
+            from { transform: translateY(8px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
         #topNotification {
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
             background: #1c1c1e; border: 1px solid #2c2c2e; color: #ffffff; 
-            padding: 10px 22px; border-radius: 50px; font-size: 13px; font-weight: 600;
-            box-shadow: 0 12px 24px rgba(0,0,0,0.2); z-index: 30000; 
-            transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15);
-            display: flex; align-items: center; gap: 10px; white-space: nowrap; pointer-events: none;
+            padding: 10px 20px; border-radius: 50px; font-size: 13px; font-weight: 600;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15); z-index: 10000; 
+            transition: top 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+            display: flex; align-items: center; gap: 8px; white-space: nowrap; pointer-events: none;
         }
-        #topNotification.show { top: 20px; }
-        .toast-check { width: 18px; height: 18px; border-radius: 50%; background: var(--success); display: flex; align-items: center; justify-content: center; color: #fff; }
-        .toast-check svg { width: 11px; height: 11px; stroke: #fff; fill: none; stroke-width: 3; }
+        #topNotification.show { top: 16px; }
+        .toast-check { width: 16px; height: 16px; border-radius: 50%; background: var(--success); display: flex; align-items: center; justify-content: center; color: #fff; }
+        .toast-check svg { width: 10px; height: 10px; stroke: #fff; fill: none; stroke-width: 3; }
 
-        /* 👑 কার্ড ডিজাইন */
-        .card { 
-            background: var(--card); border-radius: 20px; overflow: hidden;
-            border: 1px solid rgba(0, 0, 0, 0.03); box-shadow: 0 3px 10px rgba(0,0,0,0.02); 
-            margin-bottom: 14px; padding-top: 2px;
-            animation: iosPop 0.3s cubic-bezier(0.1, 0.8, 0.25, 1);
-            max-width: 100%;
+        /* 📱 Social Media Modal Section */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            z-index: 999; justify-content: center; align-items: flex-end;
         }
+        .modal-content {
+            background: #ffffff; width: 100%; max-width: 400px; border-top-left-radius: 20px; border-top-right-radius: 20px;
+            padding: 24px 20px 30px 20px; animation: slideUp 0.3s cubic-bezier(0.1, 0.8, 0.25, 1);
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        /* 🟢 বাম কোনারে গোল লোগো + প্ল্যাটফর্মের নাম */
-        .category-row {
-            display: flex; align-items: center; justify-content: flex-start; gap: 8px;
-            padding: 12px 14px; border-bottom: 1px dashed var(--border);
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .modal-title { font-size: 17px; font-weight: 700; color: var(--text-dark); }
+        .close-btn { font-size: 20px; font-weight: 600; color: var(--text-muted); cursor: pointer; border: none; background: none; }
+
+        .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .social-card {
+            background: #f2f2f7; border: 1.5px solid transparent; border-radius: 12px; padding: 12px;
+            display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s ease;
         }
-        .category-badge {
-            font-size: 14px; font-weight: 800; color: var(--text-dark);
-        }
+        .social-card:active { transform: scale(0.97); }
+        .social-card.active { background: rgba(0,122,255,0.08); border-color: var(--primary); }
+        .social-icon { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; }
+        .social-name { font-size: 13px; font-weight: 600; color: var(--text-dark); }
+
+        .form-group { margin-top: 12px; display: flex; flex-direction: column; gap: 12px; }
         
-        .category-logo-img { 
-            width: 24px; height: 24px; object-fit: cover; border-radius: 50%;
-            border: 1px solid rgba(0,0,0,0.08);
-        }
-        
-        .summary-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 14px; gap: 10px; border-bottom: 1px solid #f9f9fb;
-        }
-        .summary-row:last-child { border-bottom: none; }
-        
-        .row-label { font-size: 12px; color: #48484a; font-weight: 700; white-space: nowrap; }
-        .row-value-copy { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text-dark); justify-content: flex-end; max-width: 78%; }
-        .value-text { font-family: monospace; color: var(--text-dark); word-break: break-all; text-align: right; user-select: text; -webkit-user-select: text; }
-
-        .inline-copy-btn {
-            width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--border);
-            background: #ffffff; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.2s ease; flex-shrink: 0;
-        }
-        .inline-copy-btn svg { width: 11px; height: 11px; fill: var(--text-muted); }
-        .inline-copy-btn:active { transform: scale(0.88); background: #f2f2f7; }
-        .inline-copy-btn.copied { background: var(--success) !important; border-color: var(--success) !important; }
-        .inline-copy-btn.copied svg { fill: #fff !important; }
-
-        /* 🛠️ বাটন লেআউট প্যানেল */
-        .card-actions {
-            display: flex; 
-            flex-direction: row; 
-            gap: 8px;
-            padding: 10px 14px; 
-            background: rgba(0,0,0,0.005);
-            border-top: 1px solid #f2f2f7;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .action-btn {
-            border: none; background: none; font-size: 12.5px;
-            cursor: pointer; display: flex; align-items: center; gap: 5px;
-            padding: 10px 12px; border-radius: 12px; transition: all 0.2s;
-        }
-
-        .action-btn.view-inbox { 
-            flex: 1; 
-            color: #ffffff; 
-            background: linear-gradient(135deg, #007aff, #0056b3);
-            justify-content: center;
-            font-weight: 700;
-            letter-spacing: -0.2px;
-            box-shadow: 0 2px 6px rgba(0, 122, 255, 0.2);
-        }
-        .action-btn.view-inbox:active { transform: scale(0.97); opacity: 0.95; }
-        
-        .icon-container {
-            position: relative;
-            width: 14px;
-            height: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .action-btn.view-inbox svg.mail-icon { width: 13px; height: 13px; fill: none; stroke: #ffffff; stroke-width: 2.5; position: absolute; z-index: 1; }
-        
-        .btn-ios-spinner {
-            display: none;
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255, 255, 255, 0.25);
-            border-top-color: #ffffff;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-            z-index: 2;
-        }
-        
-        .action-btn.delete-mail-btn { 
-            color: var(--danger); 
-            font-weight: 700;
-            background: rgba(255, 59, 48, 0.08); 
-            justify-content: center;
-            flex-shrink: 0;
-            border: 1px solid rgba(255, 59, 48, 0.1);
-        }
-        .action-btn.delete-mail-btn:active { transform: scale(0.95); background: rgba(255, 59, 48, 0.15); }
-        .action-btn.delete-mail-btn svg { width: 13px; height: 13px; fill: none; stroke: var(--danger); stroke-width: 2.5; }
-
-        .message-box { text-align: center; color: var(--text-muted); font-weight: 600; padding: 40px 20px; font-size: 13px; }
-
-        .counter-container {
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 13px; color: var(--text-muted); font-weight: 600; margin-bottom: 14px; padding: 0 4px;
-        }
-        .counter-value {
-            color: var(--primary); font-weight: 700; background: rgba(0, 122, 255, 0.1);
-            padding: 2px 8px; border-radius: 20px; font-size: 12px;
-        }
-
-        .inbox-section {
-            margin-top: 5px;
-            display: none; 
-            animation: iosPop 0.35s cubic-bezier(0.1, 0.8, 0.25, 1);
-        }
-        .inbox-title-bar { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 20px; 
-            gap: 12px;
-        }
-
-        .live-title-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            flex: 1;
-        }
-        .live-pulse-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--success);
-            border-radius: 50%;
-            animation: pulseBlink 1.2s infinite ease-in-out;
-        }
-        .inbox-title-bar h3 { 
-            font-size: 14px; 
-            font-weight: 800; 
-            color: var(--text-dark); 
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            letter-spacing: -0.3px;
-        }
-
-        @keyframes pulseBlink {
-            0% { transform: scale(0.8); opacity: 0.5; box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.7); }
-            50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 8px 2px rgba(52, 199, 89, 0.4); }
-            100% { transform: scale(0.8); opacity: 0.5; box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
-        }
-
-        .close-inbox-btn, .refresh-inbox-btn { 
-            background: #e5e5ea; 
-            color: #48484a; 
-            border: none; 
-            padding: 6px 14px; 
-            border-radius: 20px; 
-            font-size: 12px; 
-            font-weight: 700; 
-            cursor: pointer; 
-            transition: background 0.2s;
-        }
-        .close-inbox-btn:active, .refresh-inbox-btn:active { background: #d1d1d6; }
-
-        .mail-item {
-            background: var(--card);
-            border-radius: 16px;
-            padding: 14px;
-            margin-bottom: 14px;
-            border: 1px solid var(--border);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.01);
-            animation: iosPop 0.25s ease;
-        }
-        .mail-meta {
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            user-select: text;
-            -webkit-user-select: text;
-        }
-        .mail-meta span b { color: #48484a; font-weight: 600; }
-        
-        .mail-subject { 
-            font-size: 13.5px; 
-            font-weight: 700; 
-            color: var(--text-dark); 
-            margin-bottom: 8px; 
-            line-height: 1.3; 
-            user-select: text !important;
-            -webkit-user-select: text !important;
-        }
-
-        .mail-html-viewport {
-            margin-top: 10px;
-            border-top: 1px solid #f2f2f7;
-            padding-top: 10px;
-            overflow: hidden;
-        }
-        .mail-iframe {
-            width: 100%;
-            height: 50px; 
-            border: 1px solid #e5e5ea;
-            background: #ffffff;
-            border-radius: 10px;
-            display: block;
-            transition: height 0.2s ease; 
-        }
-
-        /* 🔴 iOS Security Password Delete Modal Styles */
-        .ios-delete-modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px); display: none; align-items: center;
-            justify-content: center; z-index: 40000; padding: 20px;
-        }
-        .ios-delete-modal-overlay.show { display: flex; }
-        .ios-delete-modal {
-            background: var(--card); width: 100%; max-width: 320px;
-            border-radius: 22px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            animation: iosModalPop 0.28s cubic-bezier(0.1, 0.8, 0.25, 1);
-            overflow: hidden; border: 1px solid var(--border); padding-bottom: 0px;
-        }
-        @keyframes iosModalPop {
-            from { transform: scale(1.06); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        .ios-delete-modal-header { font-size: 16px; font-weight: 700; padding: 20px 16px 6px; color: var(--text-dark); letter-spacing: -0.4px; }
-        .ios-delete-modal-body { padding: 0 16px 16px; font-size: 13px; color: var(--text-muted); line-height: 1.4; font-weight: 500; }
-        .target-delete-email { font-weight: 700; color: var(--danger); word-break: break-all; margin: 4px 0 14px; font-family: monospace; font-size: 12px; }
-
-        /* 🔑 পাসওয়ার্ড ইনপুট ফিল্ড ও গ্লো স্টাইলিং */
-        .pwd-input-container {
+        /* 👑 ইনপুট বক্স ও SVG টিক চিহ্ন ডিজাইন */
+        .input-box-wrapper {
             position: relative;
             width: 100%;
-            margin-top: 6px;
+            display: flex;
+            align-items: center;
         }
-        .pwd-input-box {
-            width: 100%;
-            padding: 12px 38px 12px 14px;
-            font-size: 14px;
-            font-weight: 600;
-            border-radius: 12px;
-            border: 1.5px solid var(--border);
-            outline: none;
-            background: #f9f9fb;
-            color: var(--text-dark);
-            text-align: center;
-            transition: all 0.25s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-            user-select: text;
-            -webkit-user-select: text;
+        .modal-input {
+            width: 100%; padding: 12px; padding-right: 36px; border-radius: 10px; border: 1.5px solid var(--border);
+            font-size: 14px; outline: none; background: #f9f9fb; transition: all 0.2s ease;
         }
-        .pwd-input-box:focus {
-            background: #ffffff;
-            border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(0, 122, 255, 0.2);
-        }
-        .pwd-input-box.wrong {
-            border-color: var(--danger) !important;
-            background: rgba(255, 59, 48, 0.05) !important;
-            box-shadow: 0 0 12px rgba(255, 59, 48, 0.4) !important;
-            animation: shake 0.35s ease-in-out;
-        }
-        .pwd-input-box.correct {
-            border-color: var(--success) !important;
-            background: rgba(52, 199, 89, 0.05) !important;
-            box-shadow: 0 0 12px rgba(52, 199, 89, 0.5) !important;
-        }
+        .modal-input:focus { background: #fff; }
+        .modal-input.is-valid { border-color: var(--success) !important; background: rgba(52, 199, 89, 0.03); }
+        .modal-input.is-invalid { border-color: var(--error) !important; background: rgba(255, 59, 48, 0.03); }
 
-        .pwd-status-icon {
+        .valid-tick-svg {
             position: absolute;
             right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: all 0.2s ease;
-            pointer-events: none;
+            width: 18px;
+            height: 18px;
+            fill: var(--success);
+            display: none;
+            animation: iosPop 0.2s ease;
         }
-        .pwd-status-icon.show-success {
-            opacity: 1;
-            background: var(--success);
-            transform: translateY(-50%) scale(1);
-        }
-        .pwd-status-icon.show-error {
-            opacity: 1;
-            background: var(--danger);
-            transform: translateY(-50%) scale(1);
-        }
-        .pwd-status-icon svg {
-            width: 12px;
-            height: 12px;
-            stroke: #ffffff;
-            fill: none;
-            stroke-width: 3;
+        .modal-input.is-valid + .valid-tick-svg {
+            display: block;
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-8px); }
-            40%, 80% { transform: translateX(8px); }
+        .confirm-save-btn {
+            width: 100%; padding: 14px; background: var(--success); color: #fff; border: none;
+            border-radius: 12px; font-size: 15px; font-weight: 700; margin-top: 10px; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; gap: 8px; transition: all 0.2s ease;
         }
+        .confirm-save-btn:disabled { background: #a3e6b5 !important; cursor: not-allowed; opacity: 0.7; }
 
-        .ios-delete-modal-footer { display: flex; border-top: 1px solid var(--border); }
-        .ios-delete-modal-btn {
-            flex: 1; border: none; background: transparent; padding: 13px 10px;
-            font-size: 15px; font-weight: 600; cursor: pointer; text-align: center;
+        #successOverlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.25); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            z-index: 9999; justify-content: center; align-items: center;
         }
-        .ios-delete-modal-btn.cancel { color: var(--primary); border-right: 1px solid var(--border); }
-        .ios-delete-modal-btn.confirm { color: var(--danger); font-weight: 700; }
-        .ios-delete-modal-btn:active { background: rgba(0,0,0,0.05); }
-
-        @keyframes iosPop {
-            from { transform: translateY(10px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .success-card {
+            background: #ffffff; border-radius: 20px; padding: 30px; width: 80%; max-width: 300px;
+            display: flex; flex-direction: column; align-items: center; box-shadow: 0 15px 30px rgba(0,0,0,0.08);
         }
+        .success-circle { width: 64px; height: 64px; border-radius: 50%; background: var(--success); display: flex; align-items: center; justify-content: center; margin-bottom: 16px;}
+        .tick-svg { width: 32px; height: 32px; stroke: #fff; fill: none; stroke-width: 3.5; }
+        .success-heading { font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
+        .success-sub { font-size: 13px; font-weight: 500; color: var(--text-muted); text-align: center; line-height: 1.4; }
     </style>
 </head>
 <body>
 
-    <!-- নোটিফিকেশন টোস্ট -->
     <div id="topNotification">
-        <div class="toast-check">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <span id="notificationText">Copied Successfully!</span>
+        <div class="toast-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        Copied Successfully!
     </div>
 
-    <!-- হিস্টোরি ভিউ কন্টেইনার -->
-    <div id="historyViewContainer">
-        <h2 class="page-title">Temp Mail History</h2>
-
-        <!-- সার্চ বার -->
-        <div class="search-wrapper">
-            <div class="premium-search-icon">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--text-muted)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            </div>
-            <input type="text" id="searchInput" class="search-input" placeholder="Search by email..." onkeydown="if(event.key === 'Enter') handleMailSearch()">
-            <button class="search-btn" onclick="handleMailSearch()">Search</button>
-        </div>
-
-        <!-- কাউন্টার -->
-        <div class="counter-container">
-            <span>Total Mails:</span>
-            <span id="totalCount" class="counter-value">0</span>
-        </div>
-
-        <!-- হিস্টোরি BOX -->
-        <div id="historyBox">
-            <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line long"></div></div>
-            <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line long"></div></div>
-        </div>
+<div class="wrapper">
+    
+    <div class="brand-header">
+        <h1 class="brand-title">Temporary Mail</h1>
     </div>
 
-    <!-- 📥 লাইভ ইনবক্স ডিসপ্লে প্যানেল -->
-    <div class="inbox-section" id="inboxSection">
+    <div class="section-label">Your Temporary Email</div>
+    <div class="input-card">
+        <input type="text" id="mailAddressText" class="field-input" readonly value="Generating mail...">
+        <button class="inline-copy-btn" id="copyMailBtn" onclick="copyMailAddress()">
+            <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+        </button>
+    </div>
+
+    <div class="btn-group">
+        <button id="changeBtn" class="proceed-btn btn-change" onclick="generateNewMail()">
+            <div id="changeSpinner" class="btn-spinner"></div>
+            <svg id="changeIcon" class="btn-icon" viewBox="0 0 24 24">
+                <path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/>
+            </svg>
+            <span id="changeBtnText">Change</span>
+        </button>
+        
+        <button id="saveBtn" class="proceed-btn btn-save" onclick="openSocialModal()" disabled>
+            <div id="saveSpinner" class="btn-spinner"></div>
+            <svg id="saveIcon" class="btn-icon" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#ffffff"/>
+            </svg>
+            <span id="saveBtnText">Save</span>
+        </button>
+    </div>
+
+    <div class="inbox-section">
         <div class="inbox-title-bar">
-            <button class="close-inbox-btn" onclick="closeInboxView()">Close</button>
-            <div class="live-title-wrapper">
-                <div class="live-pulse-dot"></div>
+            <div class="inbox-title-wrapper">
+                <div class="live-indicator"></div>
                 <h3>Live Inbox Updates</h3>
             </div>
-            <button class="refresh-inbox-btn" onclick="refreshActiveInbox()">Refresh</button>
+            <button class="refresh-inbox-btn" onclick="checkLiveInbox(true)">Refresh</button>
         </div>
-        <div id="inboxContentBox"></div>
-    </div>
-
-    <!-- 🔴 iOS Security Password Delete Modal Overlay HTML -->
-    <div id="iosDeleteModalOverlay" class="ios-delete-modal-overlay">
-        <div class="ios-delete-modal">
-            <div class="ios-delete-modal-header">Security Verification</div>
-            <div class="ios-delete-modal-body">
-                <p>Enter password to safely delete account:</p>
-                <p id="targetDeleteEmail" class="target-delete-email">example@mail.com</p>
-                
-                <!-- 🔒 সিকিউরিটি পাসওয়ার্ড ইনপুট বক্স + স্ট্যাটাস আইকন -->
-                <div class="pwd-input-container">
-                    <input type="password" id="deletePasswordInput" class="pwd-input-box" placeholder="Enter Security Password" onkeydown="if(event.key === 'Enter') verifyAndDeleteAccount()">
-                    <div id="pwdStatusIcon" class="pwd-status-icon">
-                        <svg id="pwdStatusSvg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                    </div>
-                </div>
-            </div>
-            <div class="ios-delete-modal-footer">
-                <button class="ios-delete-modal-btn cancel" onclick="closeDeleteModal()">Cancel</button>
-                <button class="ios-delete-modal-btn confirm" onclick="verifyAndDeleteAccount()">Delete</button>
-            </div>
+        <div id="liveInboxContent">
+            <!-- Dynamic Loader -->
         </div>
     </div>
 
-    <script>
-        let allMailsGlobal = [];
-        let activeMailIndex = null;
-        let targetDeleteIndex = null; 
-        let inboxIntervalTimer = null; 
+</div>
+
+<!-- 🌐 Social Media Selection Modal -->
+<div id="socialModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Select Platform</div>
+            <button class="close-btn" onclick="closeSocialModal()">✕</button>
+        </div>
         
-        // 🔑 সিকিউরিটি পাসওয়ার্ড ফিল্টার (প্রয়োজন মতো পরিবর্তন করে নিতে পারেন)
-        const REQUIRED_DELETE_PASSWORD = "123";
+        <div class="social-grid">
+            <div class="social-card" onclick="selectSocial('Twitter', this)">
+                <img src="https://i.ibb.co.com/cSm6XFWX/images.png" class="social-icon" alt="Twitter">
+                <span class="social-name">Twitter</span>
+            </div>
+            <div class="social-card" onclick="selectSocial('Free Fire', this)">
+                <img src="https://i.ibb.co.com/KxdhRtx3/images.jpg" class="social-icon" alt="Free Fire">
+                <span class="social-name">Free Fire</span>
+            </div>
+        </div>
 
-        function triggerNotification(message, statusType = 'success') {
-            const notif = document.getElementById('topNotification');
-            const checkContainer = notif.querySelector('.toast-check');
-            document.getElementById('notificationText').innerText = message;
-
-            if(statusType === 'danger') {
-                checkContainer.style.background = "var(--danger)";
-                checkContainer.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
-            } else {
-                checkContainer.style.background = "var(--success)";
-                checkContainer.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
-            }
-            notif.classList.add('show');
-            setTimeout(() => { notif.classList.remove('show'); }, 2200);
-        }
-
-        function copyMailText(text, btnId) {
-            if(!text || text === 'N/A') return;
-            navigator.clipboard.writeText(text).then(() => {
-                const btn = document.getElementById(btnId);
-                const icon = btn.querySelector('svg');
-                btn.classList.add('copied');
-                icon.innerHTML = '<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="#ffffff"/>';
-                triggerNotification("Copied Successfully!", 'success');
-                setTimeout(function() {
-                    btn.classList.remove('copied');
-                    icon.innerHTML = '<path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" fill="#8e8e93"/>';
-                }, 2200);
-            });
-        }
-
-        function handleMailSearch() {
-            const searchBtn = document.querySelector('.search-btn');
-            const originalText = searchBtn.innerText;
-            searchBtn.innerHTML = '<div class="spinner"></div>';
-            searchBtn.disabled = true;
-
-            setTimeout(() => {
-                const query = document.getElementById('searchInput').value.trim().toLowerCase();
-                if (query === "") {
-                    renderMails(allMailsGlobal);
-                } else {
-                    const filtered = allMailsGlobal.filter(item => (item.email || '').trim().toLowerCase() === query);
-                    renderMails(filtered);
-                }
-                searchBtn.innerHTML = originalText;
-                searchBtn.disabled = false;
-            }, 400); 
-        }
-
-        function escapeHtml(text) {
-            if(!text) return "";
-            return text.replace(/[&<>]/g, function(c) {
-                return {'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c];
-            });
-        }
-
-        function openDeleteModal(index) {
-            targetDeleteIndex = index;
-            const mailData = allMailsGlobal[index];
-            if(!mailData) return;
-
-            const pwdInput = document.getElementById('deletePasswordInput');
-            const statusIcon = document.getElementById('pwdStatusIcon');
-            pwdInput.value = "";
-            pwdInput.className = "pwd-input-box";
-            statusIcon.className = "pwd-status-icon";
+        <div id="credentialFields" class="form-group" style="display: none;">
+            <div class="section-label" id="platformLabel">Account Info</div>
             
-            document.getElementById('targetDeleteEmail').innerText = mailData.email || 'N/A';
-            document.getElementById('iosDeleteModalOverlay').classList.add('show');
+            <!-- Username Input Box -->
+            <div class="input-box-wrapper" id="userBoxWrapper">
+                <input type="text" id="socialUsername" class="modal-input" placeholder="Enter Twitter Username" oninput="validateInputLive()">
+                <svg class="valid-tick-svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            </div>
+
+            <!-- Password Input Box -->
+            <div class="input-box-wrapper" id="passBoxWrapper">
+                <input type="password" id="socialPassword" class="modal-input" placeholder="Enter Twitter Password" oninput="validateInputLive()">
+                <svg class="valid-tick-svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            </div>
             
-            setTimeout(() => { pwdInput.focus(); }, 150);
-        }
+            <button id="modalSaveBtn" class="confirm-save-btn" onclick="validateAndSubmit()" disabled>
+                Save Credentials
+            </button>
+        </div>
+    </div>
+</div>
 
-        function closeDeleteModal() {
-            document.getElementById('iosDeleteModalOverlay').classList.remove('show');
-            targetDeleteIndex = null;
-        }
+<div id="successOverlay">
+    <div class="success-card">
+        <div class="success-circle">
+            <svg class="tick-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="success-heading">Saved Successfully!</div>
+        <div class="success-sub">Account data added to history. Closing app...</div>
+    </div>
+</div>
 
-        // 🔒 পাসওয়ার্ড চেকার, স্ট্যাটাস অ্যানিমেশন ও অ্যাকাউন্ট ডিলিট প্রসেসর
-        function verifyAndDeleteAccount() {
-            const pwdInput = document.getElementById('deletePasswordInput');
-            const statusIcon = document.getElementById('pwdStatusIcon');
-            const statusSvg = document.getElementById('pwdStatusSvg');
-            const enteredPwd = pwdInput.value.trim();
-            const tg = window.Telegram ? window.Telegram.WebApp : null;
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.ready(); tg.expand();
 
-            if (enteredPwd === REQUIRED_DELETE_PASSWORD) {
-                pwdInput.className = "pwd-input-box correct";
-                statusIcon.className = "pwd-status-icon show-success";
-                statusSvg.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
-                
-                if(tg && tg.HapticFeedback) { 
-                    tg.HapticFeedback.notificationOccurred('success'); 
-                }
+    let currentAccountData = {
+        action: "save_temp_mail",
+        email: "",
+        password: "",
+        token: "",
+        createdAt: "",
+        platform: "",
+        username: "",
+        platformPassword: ""
+    };
 
-                setTimeout(() => {
-                    executeDeleteMailAccount();
-                }, 500);
+    let selectedPlatform = "";
+    let inboxInterval = null; 
+    let currentMailsIdString = ""; 
 
-            } else {
-                pwdInput.className = "pwd-input-box wrong";
-                statusIcon.className = "pwd-status-icon show-error";
-                statusSvg.innerHTML = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
-                
-                if(tg && tg.HapticFeedback) { 
-                    tg.HapticFeedback.notificationOccurred('error'); 
-                }
+    window.addEventListener('DOMContentLoaded', () => {
+        generateNewMail();
+    });
 
-                triggerNotification("Incorrect Security Password!", 'danger');
-                
-                setTimeout(() => {
-                    pwdInput.className = "pwd-input-box";
-                    statusIcon.className = "pwd-status-icon";
-                }, 1200);
-            }
-        }
-
-        function executeDeleteMailAccount() {
-            if (targetDeleteIndex === null) return;
-            const targetData = allMailsGlobal[targetDeleteIndex];
-            if (!targetData) return;
-
-            const deletedEmail = targetData.email;
-            allMailsGlobal.splice(targetDeleteIndex, 1);
-            
-            renderMails(allMailsGlobal);
-            closeDeleteModal();
-
-            triggerNotification("Account Deleted Successfully!", 'danger');
-
-            if (window.Telegram && window.Telegram.WebApp) {
-                try {
-                    window.Telegram.WebApp.sendData(JSON.stringify({
-                        action: "delete_account",
-                        email: deletedEmail
-                    }));
-                } catch(tgErr) { 
-                    console.log("Telegram sendData error:", tgErr); 
-                }
-            }
-        }
-
-        function injectNonStopLoader() {
-            const inboxContentBox = document.getElementById('inboxContentBox');
-            inboxContentBox.innerHTML = `
-                <div class="premium-ios-loader">
-                    <div class="ios-loader-wrapper">
-                        <svg class="ios-high-quality-spinner" viewBox="0 0 100 100">
-                            <defs>
-                                <linearGradient id="blueArcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stop-color="#007aff" />
-                                    <stop offset="100%" stop-color="#00c6ff" />
-                                </linearGradient>
-                                <linearGradient id="greenArcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stop-color="#34c759" />
-                                    <stop offset="100%" stop-color="#30d158" />
-                                </linearGradient>
-                            </defs>
-                            <circle cx="50" cy="50" r="40" stroke="url(#blueArcGrad)" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="80 170" stroke-dashoffset="0" />
-                            <circle cx="50" cy="50" r="40" stroke="url(#greenArcGrad)" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="80 170" stroke-dashoffset="-125" />
-                        </svg>
-                        
-                        <svg class="ios-premium-mail-icon" viewBox="0 0 64 64" fill="none">
-                            <defs>
-                                <linearGradient id="mailBgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" stop-color="#2f97ff"/>
-                                    <stop offset="100%" stop-color="#0062e3"/>
-                                </linearGradient>
-                            </defs>
-                            <rect x="4" y="14" width="56" height="36" rx="10" fill="url(#mailBgGrad)"/>
-                            <path d="M4 16.5L29.3 35.2C30.9 36.4 33.1 36.4 34.7 35.2L60 16.5" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M4 46.5L23 31M60 46.5L41 31" stroke="#ffffff" stroke-opacity="0.4" stroke-width="2.5" stroke-linecap="round"/>
-                        </svg>
-                    </div>
-                    <div class="loader-text-main">Waiting for messages...</div>
+    function injectNonStopLoader(customText = "Waiting for messages...") {
+        return `
+            <div class="premium-ios-loader">
+                <div class="ios-loader-wrapper">
+                    <svg class="ios-high-quality-spinner" viewBox="0 0 100 100">
+                        <defs>
+                            <linearGradient id="iosRainbowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#007aff" />
+                                <stop offset="30%" stop-color="#5856d6" />
+                                <stop offset="60%" stop-color="#ff2d55" />
+                                <stop offset="100%" stop-color="#e5e5ea" stop-opacity="0" />
+                            </linearGradient>
+                        </defs>
+                        <circle cx="50" cy="50" r="40" stroke="url(#iosRainbowGrad)" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="160 90"/>
+                    </svg>
+                    <svg class="ios-premium-mail-icon" viewBox="0 0 64 64" fill="none">
+                        <defs>
+                            <linearGradient id="mailBgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#2f97ff"/>
+                                <stop offset="100%" stop-color="#0062e3"/>
+                            </linearGradient>
+                        </defs>
+                        <rect x="4" y="14" width="56" height="36" rx="10" fill="url(#mailBgGrad)"/>
+                        <path d="M4 16.5L29.3 35.2C30.9 36.4 33.1 36.4 34.7 35.2L60 16.5" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M4 46.5L23 31M60 46.5L41 31" stroke="#ffffff" stroke-opacity="0.4" stroke-width="2.5" stroke-linecap="round"/>
+                    </svg>
                 </div>
-            `;
-        }
+                <div class="loader-text-main">${customText}</div>
+            </div>
+        `;
+    }
 
-        function viewInboxAction(index) {
-            activeMailIndex = index;
-            const mailData = allMailsGlobal[index];
-            if (!mailData) return;
+    async function generateNewMail() {
+        if(inboxInterval) { clearInterval(inboxInterval); } 
+        setLoadingState(true);
+        document.getElementById('mailAddressText').value = "Generating mail...";
+        document.getElementById('liveInboxContent').innerHTML = injectNonStopLoader("Waiting for messages...");
+        currentMailsIdString = ""; 
 
-            const activeBtn = document.getElementById(`viewInboxBtn-${index}`);
-            if(activeBtn) {
-                const spinner = activeBtn.querySelector('.btn-ios-spinner');
-                if(spinner) spinner.style.display = 'block';
+        try {
+            const domainRes = await fetch('https://api.mail.tm/domains');
+            const domainData = await domainRes.json();
+            
+            if(!domainData['hydra:member'] || domainData['hydra:member'].length === 0) {
+                throw new Error("No domains available");
+            }
+            
+            let selectedDomain = domainData['hydra:member'][0].domain;
+
+            const randomUser = 'temp_' + Math.random().toString(36).substring(2, 11);
+            const randomPassword = Math.random().toString(36).substring(2, 15) + 'tM!';
+            const emailAddress = `${randomUser}@${selectedDomain}`;
+
+            const createAccountRes = await fetch('https://api.mail.tm/accounts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address: emailAddress, password: randomPassword })
+            });
+
+            const tokenRes = await fetch('https://api.mail.tm/token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address: emailAddress, password: randomPassword })
+            });
+            const tokenInfo = await tokenRes.json();
+
+            if (tokenInfo.token) {
+                currentAccountData.email = emailAddress;
+                currentAccountData.password = randomPassword;
+                currentAccountData.token = tokenInfo.token;
+                currentAccountData.createdAt = new Date().toISOString();
+
+                document.getElementById('mailAddressText').value = emailAddress;
+                setLoadingState(false);
+
+                checkLiveInbox(false);
+                
+                inboxInterval = setInterval(() => {
+                    checkLiveInbox(false);
+                }, 5000);
+
+            } else {
+                throw new Error("Token generation failed");
             }
 
-            document.getElementById('historyViewContainer').style.display = 'none';
-            document.getElementById('inboxSection').style.display = 'block';
-            
-            injectNonStopLoader();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (error) {
+            console.error(error);
+            document.getElementById('mailAddressText').value = "Failed to generate. Try again.";
+            setLoadingState(false);
+            document.getElementById('saveBtn').setAttribute('disabled', 'true');
+            document.getElementById('liveInboxContent').innerHTML = '<div class="premium-ios-loader"><div class="loader-text-main" style="color:var(--error)">Failed to initialize live inbox.</div></div>';
+        }
+    }
 
-            if(inboxIntervalTimer) clearInterval(inboxIntervalTimer);
+    function checkLiveInbox(isManual = false) {
+        if (!currentAccountData.token) return;
+        
+        const container = document.getElementById('liveInboxContent');
+        if (isManual) {
+            container.innerHTML = injectNonStopLoader("Waiting for messages...");
+        }
 
-            function checkMailLoop() {
-                fetchInboxFromServer(mailData.email, mailData.token, function(err, messages) {
-                    if(err || !messages || messages.length === 0) {
-                        return; 
+        fetch(`https://api.mail.tm/messages`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${currentAccountData.token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data && data["hydra:member"] && data["hydra:member"].length > 0) {
+                const messages = data["hydra:member"].slice(0, 5);
+                let checkString = messages.map(m => m.id).join(",");
+                
+                if(checkString === currentMailsIdString && !isManual) {
+                    return; 
+                }
+                
+                currentMailsIdString = checkString; 
+
+                const fetchPromises = messages.map(msg => {
+                    return fetch(`https://api.mail.tm/messages/${msg.id}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${currentAccountData.token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(res => res.ok ? res.json() : null)
+                    .catch(() => null);
+                });
+
+                Promise.all(fetchPromises).then(fullMessages => {
+                    const validMessages = fullMessages.filter(m => m !== null);
+                    
+                    if(validMessages.length === 0) {
+                        container.innerHTML = '<div class="premium-ios-loader"><div class="loader-text-main">Failed to load message body.</div></div>';
+                        return;
                     }
 
-                    clearInterval(inboxIntervalTimer);
-                    const inboxContentBox = document.getElementById('inboxContentBox');
-                    const displayMessages = messages.slice(0, 5);
-                    
-                    const fetchPromises = displayMessages.map(msg => {
-                        return fetch(`https://api.mail.tm/messages/${msg.id}`, {
-                            method: 'GET',
-                            headers: {
-                                'Authorization': `Bearer ${mailData.token}`,
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                        .then(res => res.ok ? res.json() : null)
-                        .catch(() => null);
-                    });
-
-                    Promise.all(fetchPromises).then(fullMessages => {
-                        const validMessages = fullMessages.filter(m => m !== null);
+                    container.innerHTML = validMessages.map((msg, i) => {
+                        let fromAddress = msg.from && msg.from.address ? msg.from.address : "(unknown)";
+                        let fromName = msg.from && msg.from.name ? msg.from.name : fromAddress.split('@')[0];
+                        let avatarLetter = fromName.charAt(0) || 'M';
+                        let subjectText = msg.subject ? msg.subject : "(No Subject)";
                         
-                        if(validMessages.length === 0) {
-                            injectNonStopLoader(); 
-                            startInboxLoop();
-                            return;
+                        return `
+                        <div class="mail-item">
+                            <div class="mail-header-row">
+                                <div class="sender-avatar">${escapeHtml(avatarLetter)}</div>
+                                <div class="mail-meta">
+                                    <b>${escapeHtml(fromName)}</b>
+                                    <span>From: ${escapeHtml(fromAddress)}</span>
+                                </div>
+                            </div>
+                            <div class="mail-subject">${escapeHtml(subjectText)}</div>
+                            <div class="mail-html-viewport">
+                                <iframe class="mail-iframe" data-index="${i}" sandbox="allow-same-origin"></iframe>
+                            </div>
+                        </div>`;
+                    }).join('');
+
+                    const iframes = container.querySelectorAll('.mail-iframe');
+                    iframes.forEach(iframe => {
+                        const idx = parseInt(iframe.getAttribute('data-index'), 10);
+                        const msg = validMessages[idx];
+                        let rawHtml = "";
+                        let textContent = (msg.text || msg.intro || '').trim();
+
+                        if (msg.html && (Array.isArray(msg.html) ? msg.html.join('') : msg.html).trim() !== "") {
+                            rawHtml = Array.isArray(msg.html) ? msg.html.join('') : msg.html;
+                        } else if (textContent !== "") {
+                            rawHtml = `<div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif; padding:12px; color:#1c1c1e; line-height:1.5; font-size:13.5px;">${escapeHtml(textContent)}</div>`;
+                        } else {
+                            rawHtml = `<div style="font-family:-apple-system,sans-serif; padding:12px; color:#8e8e93; font-weight:600; text-align:center; font-size:13px;">No content</div>`;
                         }
 
-                        inboxContentBox.innerHTML = validMessages.map((msg, i) => {
-                            let fromAddress = msg.from && msg.from.address ? msg.from.address : "(unknown)";
-                            let subjectText = msg.subject ? msg.subject : "(No Subject)";
-                            
-                            return `
-                            <div class="mail-item">
-                                <div class="mail-meta">
-                                    <span><b>[${i + 1}] From:</b> ${escapeHtml(fromAddress)}</span>
-                                </div>
-                                <div class="mail-subject">Subject: ${escapeHtml(subjectText)}</div>
-                                <div class="mail-html-viewport">
-                                    <iframe class="mail-iframe" data-index="${i}" sandbox="allow-same-origin"></iframe>
-                                </div>
-                            </div>`;
-                        }).join('');
+                        const styleInject = `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><style>body{margin:0; padding:4px; font-family:-apple-system,BlinkMacSystemFont,sans-serif; word-break:break-word;} img{max-width:100% !important; height:auto !important;}</style>`;
+                        if (rawHtml.includes('<head>')) {
+                            rawHtml = rawHtml.replace('<head>', `<head>${styleInject}`);
+                        } else {
+                            rawHtml = styleInject + rawHtml;
+                        }
 
-                        const iframes = inboxContentBox.querySelectorAll('.mail-iframe');
-                        iframes.forEach(iframe => {
-                            const idx = parseInt(iframe.getAttribute('data-index'), 10);
-                            const msg = validMessages[idx];
-                            let rawHtml = "";
-                            
-                            let textContent = (msg.text || msg.intro || '').trim();
+                        try {
+                            const doc = iframe.contentDocument || iframe.contentWindow.document;
+                            doc.open();
+                            doc.write(rawHtml);
+                            doc.close();
 
-                            if (msg.html && (Array.isArray(msg.html) ? msg.html.join('') : msg.html).trim() !== "") {
-                                rawHtml = Array.isArray(msg.html) ? msg.html.join('') : msg.html;
-                            } else if (textContent !== "") {
-                                rawHtml = `<div style="font-family:-apple-system,sans-serif; padding:15px; color:#333; line-height:1.5;">${escapeHtml(textContent)}</div>`;
-                            } else {
-                                rawHtml = `<div style="font-family:-apple-system,sans-serif; padding:12px 10px; color:#8e8e93; font-weight:600; text-align:center; font-size:13px; margin:0;">No message</div>`;
-                            }
-
-                            if (rawHtml.includes('<head>')) {
-                                rawHtml = rawHtml.replace('<head>', '<head><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>body{margin:0; padding:0;}</style>');
-                            } else {
-                                rawHtml = `<meta name="viewport" content="width=device-width, initial-scale=1.0"><style>body{margin:0; padding:0;}</style>${rawHtml}`;
-                            }
-
-                            try {
-                                const doc = iframe.contentDocument || iframe.contentWindow.document;
-                                doc.open();
-                                doc.write(rawHtml);
-                                doc.close();
-
+                            iframe.onload = function() {
                                 setTimeout(() => {
                                     try {
                                         let contentHeight = doc.documentElement.scrollHeight || doc.body.scrollHeight;
-                                        iframe.style.height = (contentHeight + 8) + 'px';
-                                    } catch (hErr) { console.error(hErr); }
-                                }, 150);
-                            } catch(e) { console.error(e); }
-                        });
+                                        iframe.style.height = (contentHeight + 10) + 'px';
+                                    } catch (e) { console.error(e); }
+                                }, 100);
+                            };
 
-                    }).catch(err => {
-                        console.error(err);
-                        injectNonStopLoader();
-                        startInboxLoop();
+                            setTimeout(() => {
+                                try {
+                                    let contentHeight = doc.documentElement.scrollHeight || doc.body.scrollHeight;
+                                    iframe.style.height = (contentHeight + 10) + 'px';
+                                } catch(hErr) {}
+                            }, 250);
+
+                        } catch(e) {
+                            console.error("Iframe Render Error:", e);
+                        }
                     });
+
+                }).catch(err => {
+                    console.error(err);
+                    container.innerHTML = '<div class="premium-ios-loader"><div class="loader-text-main" style="color:var(--error)">❌ Error rendering rich layout.</div></div>';
                 });
-            }
 
-            function startInboxLoop() {
-                checkMailLoop(); 
-                inboxIntervalTimer = setInterval(checkMailLoop, 5000); 
-            }
-
-            startInboxLoop();
-        }
-
-        function refreshActiveInbox() {
-            if(activeMailIndex !== null) {
-                viewInboxAction(activeMailIndex);
-            }
-        }
-
-        function closeInboxView() {
-            if(inboxIntervalTimer) {
-                clearInterval(inboxIntervalTimer);
-                inboxIntervalTimer = null;
-            }
-            document.getElementById('inboxSection').style.display = 'none';
-            document.getElementById('historyViewContainer').style.display = 'block';
-            
-            const allSpinners = document.querySelectorAll('.btn-ios-spinner');
-            allSpinners.forEach(spin => spin.style.display = 'none');
-            
-            activeMailIndex = null;
-        }
-
-        function fetchInboxFromServer(email, token, callback) {
-            fetch(`https://api.mail.tm/messages`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+            } else {
+                if(currentMailsIdString !== "empty" || isManual) {
+                    currentMailsIdString = "empty";
+                    container.innerHTML = injectNonStopLoader("Waiting for messages...");
                 }
-            })
-            .then(res => {
-                if (!res.ok) throw new Error('Network response error');
-                return res.json();
-            })
-            .then(data => {
-                if (data && data["hydra:member"]) {
-                    callback(null, data["hydra:member"]);
-                } else {
-                    callback(null, []);
-                }
-            })
-            .catch(err => {
-                console.error("API Fetch Error:", err);
-                callback(err);
-            });
-        }
-
-        // 👑 লোগো এবং প্ল্যাটফর্মের নাম প্রদর্শন (গোল লোগো, FF লাল, Twitter কালো)
-        function renderMails(mailsList) {
-            const historyBox = document.getElementById('historyBox');
-            if(!mailsList || !Array.isArray(mailsList) || mailsList.length === 0) {
-                document.getElementById('totalCount').innerText = "0";
-                historyBox.innerHTML = '<div class="message-box">No temporary emails found.</div>';
-                return;
             }
-
-            document.getElementById('totalCount').innerText = mailsList.length;
-
-            const twitterLogoUrl = "https://i.ibb.co.com/cSm6XFWX/images.png";
-            const freeFireLogoUrl = "https://i.ibb.co.com/KxdhRtx3/images.jpg";
-
-            historyBox.innerHTML = mailsList.map((item, index) => {
-                let btnEmailId = 'b-em-' + index;
-                let btnExtraId = 'b-ex-' + index;
-                let btnPassId = 'b-pw-' + index;
-                let emailVal = (item.email || 'N/A').trim();
-                let platformName = item.category || item.platform || (item.playerId ? "Free Fire" : (item.username ? "Twitter" : "General"));
-                
-                let isFF = platformName.toLowerCase().includes("free fire") || platformName.toLowerCase().includes("ff") || !!item.playerId;
-                let isTwitter = platformName.toLowerCase().includes("twitter") || platformName.toLowerCase().includes("x") || !!item.username;
-
-                let categoryLogo = "";
-                let nameTextColor = "#1c1c1e";
-
-                if(isTwitter) {
-                    categoryLogo = twitterLogoUrl;
-                    nameTextColor = "#000000";
-                } else if(isFF) {
-                    categoryLogo = freeFireLogoUrl;
-                    nameTextColor = "#ff3b30";
-                }
-
-                let customRow = "";
-                if (isFF) {
-                    let playerIdVal = item.playerId || item.username || "N/A";
-                    customRow = `
-                    <div class="summary-row">
-                        <span class="row-label">Player ID</span>
-                        <div class="row-value-copy">
-                            <span class="value-text">${playerIdVal}</span>
-                            <button class="inline-copy-btn" id="${btnExtraId}" onclick="copyMailText('${playerIdVal}', '${btnExtraId}')">
-                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                            </button>
-                        </div>
-                    </div>`;
-                } else if (isTwitter) {
-                    let usernameVal = item.username || "N/A";
-                    let passwordVal = item.password || "N/A";
-                    customRow = `
-                    <div class="summary-row">
-                        <span class="row-label">Username</span>
-                        <div class="row-value-copy">
-                            <span class="value-text">${usernameVal}</span>
-                            <button class="inline-copy-btn" id="${btnExtraId}" onclick="copyMailText('${usernameVal}', '${btnExtraId}')">
-                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="summary-row">
-                        <span class="row-label">Password</span>
-                        <div class="row-value-copy">
-                            <span class="value-text">${passwordVal}</span>
-                            <button class="inline-copy-btn" id="${btnPassId}" onclick="copyMailText('${passwordVal}', '${btnPassId}')">
-                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                            </button>
-                        </div>
-                    </div>`;
-                }
-
-                return `
-                <div class="card">
-                    <!-- 🟢 ১. বাম কোনারে গোল লোগো + ফ্রি ফায়ার (লাল) / টুইটার (কালো) -->
-                    <div class="category-row">
-                        ${categoryLogo ? `<img src="${categoryLogo}" alt="${escapeHtml(platformName)}" class="category-logo-img" />` : ''}
-                        <span class="category-badge" style="color: ${nameTextColor};">${escapeHtml(platformName)}</span>
-                    </div>
-
-                    <!-- 👤 ২. ইউজারনেম/প্লেয়ার আইডি/পাসওয়ার্ড -->
-                    ${customRow}
-
-                    <!-- 📧 ৩. টেম্প মেইল -->
-                    <div class="summary-row">
-                        <span class="row-label">Temp Mail</span>
-                        <div class="row-value-copy">
-                            <span class="value-text">${emailVal}</span>
-                            <button class="inline-copy-btn" id="${btnEmailId}" onclick="copyMailText('${emailVal}', '${btnEmailId}')">
-                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- 🔘 ৪. ইনবক্স ও ডিলিট বাটন -->
-                    <div class="card-actions">
-                        <button class="action-btn view-inbox" id="viewInboxBtn-${index}" onclick="viewInboxAction(${index})">
-                            <div class="icon-container">
-                                <div class="btn-ios-spinner"></div>
-                                <svg class="mail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                            </div>
-                            <span style="margin-left: 5px;">View Inbox</span>
-                        </button>
-                        
-                        <button class="action-btn delete-mail-btn" onclick="openDeleteModal(${index})">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                            Delete
-                        </button>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            setTimeout(() => {
-                try {
-                    const searchString = window.location.search || window.location.hash.replace('#', '?');
-                    const urlParams = new URLSearchParams(searchString);
-                    const historyData = urlParams.get('data') || urlParams.get('orders'); 
-
-                    if (historyData && historyData.trim() !== "" && !historyData.startsWith("{")) {
-                        const decodedData = decodeURIComponent(historyData);
-                        allMailsGlobal = JSON.parse(decodedData);
-                        renderMails(allMailsGlobal);
-                    } else {
-                        renderMails([]);
-                    }
-                } catch (error) {
-                    console.error("JSON Parsing Error:", error);
-                    document.getElementById('historyBox').innerHTML = '<div class="message-box" style="color:var(--danger)">❌ Invalid Data Format!</div>';
-                }
-            }, 1000);
-
-            if (window.Telegram && window.Telegram.WebApp) {
-                try {
-                    window.Telegram.WebApp.ready();
-                    window.Telegram.WebApp.expand();
-                } catch(tgErr) { console.log(tgErr); }
+        })
+        .catch(err => {
+            console.error("Inbox update error:", err);
+            if (isManual) {
+                container.innerHTML = '<div class="premium-ios-loader"><div class="loader-text-main" style="color:var(--error)">Error fetching updates.</div></div>';
             }
         });
-    </script>
+    }
+
+    function escapeHtml(text) {
+        if(!text) return "";
+        return text.replace(/[&<>]/g, function(c) {
+            return {'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c];
+        });
+    }
+
+    function setLoadingState(isLoading) {
+        const changeSpinner = document.getElementById('changeSpinner');
+        const changeText = document.getElementById('changeBtnText');
+        const changeIcon = document.getElementById('changeIcon');
+        const saveIcon = document.getElementById('saveIcon');
+        const saveBtn = document.getElementById('saveBtn');
+        const changeBtn = document.getElementById('changeBtn');
+
+        if(isLoading) {
+            changeSpinner.style.display = 'block';
+            changeText.style.display = 'none';
+            changeIcon.style.display = 'none';
+            saveIcon.style.display = 'none';
+            saveBtn.setAttribute('disabled', 'true');
+            changeBtn.setAttribute('disabled', 'true');
+        } else {
+            changeSpinner.style.display = 'none';
+            changeText.style.display = 'block';
+            changeIcon.style.display = 'block';
+            saveIcon.style.display = 'block';
+            saveBtn.removeAttribute('disabled');
+            changeBtn.removeAttribute('disabled');
+        }
+    }
+
+    function copyMailAddress() {
+        const inputEl = document.getElementById('mailAddressText');
+        if(inputEl.value.includes("Generating") || inputEl.value.includes("Failed")) return;
+
+        navigator.clipboard.writeText(inputEl.value).then(() => {
+            const btn = document.getElementById('copyMailBtn');
+            const icon = btn.querySelector('svg');
+            const notif = document.getElementById('topNotification');
+            
+            btn.classList.add('copied');
+            icon.innerHTML = '<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="#ffffff"/>';
+            notif.classList.add('show');
+            
+            setTimeout(function() {
+                notif.classList.remove('show'); 
+                btn.classList.remove('copied');
+                icon.innerHTML = '<path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>';
+            }, 1800);
+        });
+    }
+
+    /* 🌐 Modal Logic */
+    function openSocialModal() {
+        document.getElementById('socialModal').style.display = 'flex';
+    }
+
+    function closeSocialModal() {
+        document.getElementById('socialModal').style.display = 'none';
+    }
+
+    function selectSocial(platform, element) {
+        selectedPlatform = platform;
+        document.querySelectorAll('.social-card').forEach(card => card.classList.remove('active'));
+        element.classList.add('active');
+        
+        const userInput = document.getElementById('socialUsername');
+        const passInput = document.getElementById('socialPassword');
+        const passWrapper = document.getElementById('passBoxWrapper');
+
+        // ফিল্ড রিসেট
+        userInput.value = "";
+        passInput.value = "";
+        userInput.className = "modal-input";
+        passInput.className = "modal-input";
+        document.getElementById('modalSaveBtn').setAttribute('disabled', 'true');
+
+        if(platform === 'Free Fire') {
+            document.getElementById('platformLabel').innerText = "Free Fire Account Info";
+            userInput.placeholder = "Enter Your Player ID";
+            passWrapper.style.display = 'none'; // ফ্রি ফায়ারে পাসওয়ার্ড তুলে দেওয়া হয়েছে
+        } else {
+            document.getElementById('platformLabel').innerText = "Twitter Account Info";
+            userInput.placeholder = "Enter Twitter Username";
+            passInput.placeholder = "Enter Twitter Password";
+            passWrapper.style.display = 'flex';
+        }
+
+        document.getElementById('credentialFields').style.display = 'flex';
+    }
+
+    /* 👑 লাইভ বক্স চেক এবং SVG টিক চিহ্ন লজিক */
+    function validateInputLive() {
+        const userInput = document.getElementById('socialUsername');
+        const passInput = document.getElementById('socialPassword');
+        const saveBtn = document.getElementById('modalSaveBtn');
+
+        const uVal = userInput.value.trim();
+        const pVal = passInput.value.trim();
+
+        let isUserValid = false;
+        let isPassValid = false;
+
+        if (selectedPlatform === 'Free Fire') {
+            isUserValid = uVal.length >= 8;
+            isPassValid = true; // পাসওয়ার্ড ইনপুট ফ্রি ফায়ারের জন্য প্রয়োজন নেই
+        } else {
+            isUserValid = uVal.length >= 4;
+            isPassValid = pVal.length >= 8;
+        }
+
+        // ইউজারনেম ফিল্ড কালার ও SVG টিক
+        if (uVal.length === 0) {
+            userInput.className = "modal-input";
+        } else if (isUserValid) {
+            userInput.className = "modal-input is-valid";
+        } else {
+            userInput.className = "modal-input is-invalid"; // শুধু লাল বর্ডার হবে
+        }
+
+        // পাসওয়ার্ড ফিল্ড কালার ও SVG টিক
+        if (selectedPlatform === 'Twitter') {
+            if (pVal.length === 0) {
+                passInput.className = "modal-input";
+            } else if (isPassValid) {
+                passInput.className = "modal-input is-valid";
+            } else {
+                passInput.className = "modal-input is-invalid";
+            }
+        }
+
+        // বাটন এক্টিভেট লজিক
+        if (isUserValid && isPassValid) {
+            saveBtn.removeAttribute('disabled');
+        } else {
+            saveBtn.setAttribute('disabled', 'true');
+        }
+    }
+
+    function validateAndSubmit() {
+        const userInp = document.getElementById('socialUsername');
+        const passInp = document.getElementById('socialPassword');
+
+        currentAccountData.platform = selectedPlatform;
+        currentAccountData.username = userInp.value.trim();
+        currentAccountData.platformPassword = selectedPlatform === 'Free Fire' ? 'N/A' : passInp.value.trim();
+
+        closeSocialModal();
+        submitMailToBot();
+    }
+
+    function submitMailToBot() {
+        if(inboxInterval) { clearInterval(inboxInterval); } 
+        document.getElementById('saveSpinner').style.display = 'block';
+        document.getElementById('saveBtnText').style.display = 'none';
+        document.getElementById('saveIcon').style.display = 'none';
+        document.getElementById('saveBtn').setAttribute('disabled', 'true');
+        document.getElementById('changeBtn').setAttribute('disabled', 'true');
+        document.getElementById('successOverlay').style.display = 'flex';
+
+        setTimeout(() => {
+            tg.sendData(JSON.stringify(currentAccountData));
+            setTimeout(() => {
+                tg.close();
+            }, 1000);
+        }, 1500);
+    }
+</script>
 </body>
 </html>
