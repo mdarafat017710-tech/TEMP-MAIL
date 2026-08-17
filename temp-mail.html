@@ -77,17 +77,18 @@
             width: 100%; 
             background: var(--card); 
             border: 1px solid var(--success); 
-            border-radius: 10px;
+            border-radius: 12px;
             position: relative; 
             display: flex; 
             align-items: center; 
             margin-bottom: 16px; 
-            box-shadow: 0 1px 4px rgba(52, 199, 89, 0.02);
+            box-shadow: 0 2px 8px rgba(52, 199, 89, 0.04);
+            min-height: 52px;
         }
 
         .field-input { 
             width: 100%; 
-            padding: 12px 14px; 
+            padding: 12px 16px; 
             border: none; 
             outline: none; 
             font-size: 14px; 
@@ -98,22 +99,23 @@
             -webkit-user-select: text;
         }
 
+        /* 👑 Updated iOS Copy Button Style */
         .inline-copy-btn {
-            width: 30px; 
-            height: 30px; 
-            border-radius: 50%; 
+            width: 36px; 
+            height: 36px; 
+            border-radius: 10px; 
             border: 1px solid var(--border);
-            background: #ffffff; 
+            background: #f8f8f9; 
             display: flex; 
             align-items: center; 
             justify-content: center;
             cursor: pointer; 
-            transition: all 0.15s ease; 
+            transition: all 0.2s ease; 
             flex-shrink: 0;
-            margin-right: 10px; 
+            margin-right: 8px; 
         }
-        .inline-copy-btn svg { width: 12px; height: 12px; fill: #b5b5b9; }
-        .inline-copy-btn:active { transform: scale(0.92); background: #f2f2f7; }
+        .inline-copy-btn svg { width: 15px; height: 15px; fill: #8e8e93; transition: fill 0.2s ease; }
+        .inline-copy-btn:active { transform: scale(0.90); background: #e5e5ea; }
         .inline-copy-btn.copied { background: var(--success) !important; border-color: var(--success) !important; }
         .inline-copy-btn.copied svg { fill: #fff !important; }
 
@@ -129,7 +131,7 @@
             flex: 1;
             padding: 14px; 
             border: none; 
-            border-radius: 10px; 
+            border-radius: 12px; 
             font-size: 15px; 
             font-weight: 600;
             cursor: pointer; 
@@ -138,13 +140,13 @@
             justify-content: center; 
             align-items: center;
             gap: 8px; 
-            min-height: 49px; 
+            min-height: 50px; 
         }
         
         .btn-change { 
             background: var(--primary); 
             color: #fff; 
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.12);
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15);
         }
         .btn-change:active { transform: scale(0.98); opacity: 0.95; }
         .btn-change:disabled { background: #a2caff !important; cursor: not-allowed; box-shadow: none; }
@@ -152,7 +154,7 @@
         .btn-save { 
             background: var(--success); 
             color: #fff; 
-            box-shadow: 0 4px 12px rgba(52, 199, 89, 0.12);
+            box-shadow: 0 4px 12px rgba(52, 199, 89, 0.15);
         }
         .btn-save:active { transform: scale(0.98); opacity: 0.95; }
         .btn-save:disabled { background: #a3e6b5 !important; cursor: not-allowed; box-shadow: none; }
@@ -207,7 +209,7 @@
             background: #e5e5ea;
             color: #48484a;
             border: none;
-            padding: 5px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 700;
@@ -302,34 +304,35 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 50px 20px;
+            padding: 40px 20px;
             background: var(--card);
-            border-radius: 20px;
-            border: 1px solid rgba(0, 0, 0, 0.02);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.03);
             box-shadow: 0 4px 12px rgba(0,0,0,0.01);
+            width: 100%;
         }
         
         .ios-loader-wrapper {
             position: relative;
-            width: 120px;
-            height: 120px;
+            width: 110px;
+            height: 110px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         
         .ios-high-quality-spinner {
             position: absolute;
-            width: 100px;
-            height: 100px;
+            width: 95px;
+            height: 95px;
             animation: iosSmoothRotate 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
         
         .ios-premium-mail-icon {
             position: absolute;
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             z-index: 5;
             filter: drop-shadow(0 4px 12px rgba(0, 122, 255, 0.25));
         }
@@ -341,7 +344,7 @@
         
         .loader-text-main {
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 15px;
+            font-size: 14px;
             color: #555559;
             font-weight: 600;
             text-align: center;
@@ -378,8 +381,8 @@
             z-index: 999; justify-content: center; align-items: flex-end;
         }
         .modal-content {
-            background: #ffffff; width: 100%; max-width: 400px; border-top-left-radius: 20px; border-top-right-radius: 20px;
-            padding: 24px 20px 30px 20px; animation: slideUp 0.3s cubic-bezier(0.1, 0.8, 0.25, 1);
+            background: #ffffff; width: 100%; max-width: 400px; border-top-left-radius: 22px; border-top-right-radius: 22px;
+            padding: 24px 20px 32px 20px; animation: slideUp 0.3s cubic-bezier(0.1, 0.8, 0.25, 1);
         }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
@@ -399,7 +402,6 @@
 
         .form-group { margin-top: 12px; display: flex; flex-direction: column; gap: 12px; }
         
-        /* 👑 ইনপুট বক্স ও SVG টিক চিহ্ন ডিজাইন */
         .input-box-wrapper {
             position: relative;
             width: 100%;
@@ -407,7 +409,7 @@
             align-items: center;
         }
         .modal-input {
-            width: 100%; padding: 12px; padding-right: 36px; border-radius: 10px; border: 1.5px solid var(--border);
+            width: 100%; padding: 12px 14px; padding-right: 38px; border-radius: 12px; border: 1.5px solid var(--border);
             font-size: 14px; outline: none; background: #f9f9fb; transition: all 0.2s ease;
         }
         .modal-input:focus { background: #fff; }
@@ -416,7 +418,7 @@
 
         .valid-tick-svg {
             position: absolute;
-            right: 12px;
+            right: 14px;
             width: 18px;
             height: 18px;
             fill: var(--success);
@@ -431,6 +433,7 @@
             width: 100%; padding: 14px; background: var(--success); color: #fff; border: none;
             border-radius: 12px; font-size: 15px; font-weight: 700; margin-top: 10px; cursor: pointer;
             display: flex; justify-content: center; align-items: center; gap: 8px; transition: all 0.2s ease;
+            min-height: 50px;
         }
         .confirm-save-btn:disabled { background: #a3e6b5 !important; cursor: not-allowed; opacity: 0.7; }
 
@@ -440,7 +443,7 @@
             z-index: 9999; justify-content: center; align-items: center;
         }
         .success-card {
-            background: #ffffff; border-radius: 20px; padding: 30px; width: 80%; max-width: 300px;
+            background: #ffffff; border-radius: 22px; padding: 30px; width: 85%; max-width: 310px;
             display: flex; flex-direction: column; align-items: center; box-shadow: 0 15px 30px rgba(0,0,0,0.08);
         }
         .success-circle { width: 64px; height: 64px; border-radius: 50%; background: var(--success); display: flex; align-items: center; justify-content: center; margin-bottom: 16px;}
@@ -525,13 +528,11 @@
         <div id="credentialFields" class="form-group" style="display: none;">
             <div class="section-label" id="platformLabel">Account Info</div>
             
-            <!-- Username Input Box -->
             <div class="input-box-wrapper" id="userBoxWrapper">
                 <input type="text" id="socialUsername" class="modal-input" placeholder="Enter Twitter Username" oninput="validateInputLive()">
                 <svg class="valid-tick-svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
             </div>
 
-            <!-- Password Input Box -->
             <div class="input-box-wrapper" id="passBoxWrapper">
                 <input type="password" id="socialPassword" class="modal-input" placeholder="Enter Twitter Password" oninput="validateInputLive()">
                 <svg class="valid-tick-svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -616,58 +617,80 @@
         document.getElementById('liveInboxContent').innerHTML = injectNonStopLoader("Waiting for messages...");
         currentMailsIdString = ""; 
 
-        try {
-            const domainRes = await fetch('https://api.mail.tm/domains');
-            const domainData = await domainRes.json();
-            
-            if(!domainData['hydra:member'] || domainData['hydra:member'].length === 0) {
-                throw new Error("No domains available");
-            }
-            
-            let selectedDomain = domainData['hydra:member'][0].domain;
+        let success = false;
+        let attempts = 0;
+        const maxAttempts = 3;
 
-            const randomUser = 'temp_' + Math.random().toString(36).substring(2, 11);
-            const randomPassword = Math.random().toString(36).substring(2, 15) + 'tM!';
-            const emailAddress = `${randomUser}@${selectedDomain}`;
-
-            const createAccountRes = await fetch('https://api.mail.tm/accounts', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ address: emailAddress, password: randomPassword })
-            });
-
-            const tokenRes = await fetch('https://api.mail.tm/token', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ address: emailAddress, password: randomPassword })
-            });
-            const tokenInfo = await tokenRes.json();
-
-            if (tokenInfo.token) {
-                currentAccountData.email = emailAddress;
-                currentAccountData.password = randomPassword;
-                currentAccountData.token = tokenInfo.token;
-                currentAccountData.createdAt = new Date().toISOString();
-
-                document.getElementById('mailAddressText').value = emailAddress;
-                setLoadingState(false);
-
-                checkLiveInbox(false);
+        while(!success && attempts < maxAttempts) {
+            attempts++;
+            try {
+                const domainRes = await fetch('https://api.mail.tm/domains', {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const domainData = await domainRes.json();
                 
-                inboxInterval = setInterval(() => {
+                if(!domainData['hydra:member'] || domainData['hydra:member'].length === 0) {
+                    throw new Error("No domains available");
+                }
+                
+                let selectedDomain = domainData['hydra:member'][0].domain;
+
+                const randomUser = 'temp_' + Math.random().toString(36).substring(2, 11);
+                const randomPassword = Math.random().toString(36).substring(2, 15) + 'tM!';
+                const emailAddress = `${randomUser}@${selectedDomain}`;
+
+                const createAccountRes = await fetch('https://api.mail.tm/accounts', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ address: emailAddress, password: randomPassword })
+                });
+
+                if (!createAccountRes.ok) {
+                    throw new Error("Account creation failed");
+                }
+
+                const tokenRes = await fetch('https://api.mail.tm/token', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ address: emailAddress, password: randomPassword })
+                });
+                const tokenInfo = await tokenRes.json();
+
+                if (tokenInfo.token) {
+                    currentAccountData.email = emailAddress;
+                    currentAccountData.password = randomPassword;
+                    currentAccountData.token = tokenInfo.token;
+                    currentAccountData.createdAt = new Date().toISOString();
+
+                    document.getElementById('mailAddressText').value = emailAddress;
+                    setLoadingState(false);
+                    success = true;
+
                     checkLiveInbox(false);
-                }, 5000);
+                    
+                    inboxInterval = setInterval(() => {
+                        checkLiveInbox(false);
+                    }, 5000);
 
-            } else {
-                throw new Error("Token generation failed");
+                } else {
+                    throw new Error("Token generation failed");
+                }
+
+            } catch (error) {
+                console.error(`Attempt ${attempts} failed:`, error);
+                if (attempts >= maxAttempts) {
+                    document.getElementById('mailAddressText').value = "Failed to generate. Try again.";
+                    setLoadingState(false);
+                    document.getElementById('saveBtn').setAttribute('disabled', 'true');
+                    document.getElementById('liveInboxContent').innerHTML = '<div class="premium-ios-loader"><div class="loader-text-main" style="color:var(--error)">Failed to initialize live inbox.</div></div>';
+                }
             }
-
-        } catch (error) {
-            console.error(error);
-            document.getElementById('mailAddressText').value = "Failed to generate. Try again.";
-            setLoadingState(false);
-            document.getElementById('saveBtn').setAttribute('disabled', 'true');
-            document.getElementById('liveInboxContent').innerHTML = '<div class="premium-ios-loader"><div class="loader-text-main" style="color:var(--error)">Failed to initialize live inbox.</div></div>';
         }
     }
 
@@ -683,7 +706,8 @@
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${currentAccountData.token}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             }
         })
         .then(res => res.json())
@@ -703,7 +727,8 @@
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${currentAccountData.token}`,
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
                         }
                     })
                     .then(res => res.ok ? res.json() : null)
@@ -862,7 +887,6 @@
         });
     }
 
-    /* 🌐 Modal Logic */
     function openSocialModal() {
         document.getElementById('socialModal').style.display = 'flex';
     }
@@ -880,7 +904,6 @@
         const passInput = document.getElementById('socialPassword');
         const passWrapper = document.getElementById('passBoxWrapper');
 
-        // ফিল্ড রিসেট
         userInput.value = "";
         passInput.value = "";
         userInput.className = "modal-input";
@@ -890,7 +913,7 @@
         if(platform === 'Free Fire') {
             document.getElementById('platformLabel').innerText = "Free Fire Account Info";
             userInput.placeholder = "Enter Your Player ID";
-            passWrapper.style.display = 'none'; // ফ্রি ফায়ারে পাসওয়ার্ড তুলে দেওয়া হয়েছে
+            passWrapper.style.display = 'none'; 
         } else {
             document.getElementById('platformLabel').innerText = "Twitter Account Info";
             userInput.placeholder = "Enter Twitter Username";
@@ -901,7 +924,6 @@
         document.getElementById('credentialFields').style.display = 'flex';
     }
 
-    /* 👑 লাইভ বক্স চেক এবং SVG টিক চিহ্ন লজিক */
     function validateInputLive() {
         const userInput = document.getElementById('socialUsername');
         const passInput = document.getElementById('socialPassword');
@@ -915,22 +937,20 @@
 
         if (selectedPlatform === 'Free Fire') {
             isUserValid = uVal.length >= 8;
-            isPassValid = true; // পাসওয়ার্ড ইনপুট ফ্রি ফায়ারের জন্য প্রয়োজন নেই
+            isPassValid = true; 
         } else {
             isUserValid = uVal.length >= 4;
             isPassValid = pVal.length >= 8;
         }
 
-        // ইউজারনেম ফিল্ড কালার ও SVG টিক
         if (uVal.length === 0) {
             userInput.className = "modal-input";
         } else if (isUserValid) {
             userInput.className = "modal-input is-valid";
         } else {
-            userInput.className = "modal-input is-invalid"; // শুধু লাল বর্ডার হবে
+            userInput.className = "modal-input is-invalid"; 
         }
 
-        // পাসওয়ার্ড ফিল্ড কালার ও SVG টিক
         if (selectedPlatform === 'Twitter') {
             if (pVal.length === 0) {
                 passInput.className = "modal-input";
@@ -941,7 +961,6 @@
             }
         }
 
-        // বাটন এক্টিভেট লজিক
         if (isUserValid && isPassValid) {
             saveBtn.removeAttribute('disabled');
         } else {
