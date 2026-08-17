@@ -528,13 +528,9 @@
     const tg = window.Telegram ? window.Telegram.WebApp : null;
     if (tg) tg.ready();
 
-    // Endpoints for failover
-    const API_ENDPOINTS = [
-      "https://api.mail.tm",
-      "https://api.mail.gw"
-    ];
+    const API_SERVERS = ["https://api.mail.tm", "https://api.mail.gw"];
+    let activeApiBase = API_SERVERS[0];
 
-    let activeBase = API_ENDPOINTS[0];
     let currentEmail = "";
     let currentPassword = "";
     let currentToken = "";
@@ -549,30 +545,23 @@
           currentEmail = parsed.email;
           currentPassword = parsed.password;
           currentToken = parsed.token;
-          activeBase = parsed.apiBase || API_ENDPOINTS[0];
-
-          if (currentEmail && currentToken) {
-            document.getElementById('active-email').innerText = currentEmail;
-            startPolling();
-            return;
-          }
+          activeApiBase = parsed.apiBase || API_SERVERS[0];
+          document.getElementById('active-email').innerText = currentEmail;
+          startPolling();
+          return;
         } catch(e){}
       }
       await createNewMail();
     });
 
-    // Custom safe fetch with API mirror fallback
-    async function safeFetch(path, options = {}) {
-      for (let base of API_ENDPOINTS) {
-        try {
-          let res = await fetch(`${base}${path}`, options);
-          if (res.ok || res.status === 409) {
-            activeBase = base;
-            return res;
-          }
-        } catch(e) {}
+    // Random string generator for temp_ prefix
+    function generateRandomUser() {
+      const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+      let result = "temp_";
+      for (let i = 0; i < 8; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
       }
-      return null;
+      return result;
     }
 
     async function createNewMail() {
@@ -585,68 +574,73 @@
         </div>`;
       fetchedMessageIds.clear();
 
-      try {
-        // Step 1: Fetch domains
-        let domRes = await safeFetch("/domains");
-        if (!domRes) throw new Error("Domains unavailable");
-        let domData = await domRes.json();
-        let domainList = domData["hydra:member"] || [];
-        if (domainList.length === 0) throw new Error("Empty domains");
+      for (let baseUrl of API_SERVERS) {
+        try {
+          // 1. Fetch available domains
+          let domRes = await fetch(`${baseUrl}/domains`);
+          if (!domRes.ok) continue;
+          let domData = await domRes.json();
+          let domainList = domData["hydra:member"] || [];
+          if (domainList.length === 0) continue;
 
-        let domain = domainList[Math.floor(Math.random() * domainList.length)].domain;
+          // 2. Select domain ending with emalupe.com or target domain
+          let targetDomainObj = domainList.find(d => d.domain.toLowerCase().includes("emalupe")) || 
+                                domainList.find(d => d.domain.toLowerCase() === "emalupe.com") || 
+                                domainList[0];
+          
+          let domain = targetDomainObj.domain;
 
-        // Step 2: Specific strict password format required by mail.tm
-        let randStr = Math.random().toString(36).substring(2, 10);
-        let email = `user_${randStr}@${domain}`;
-        let password = `Bjs#${randStr}99`; // Meets length, digit, symbol, uppercase rules
+          // 3. Create temp_xxxxxxxx prefix email and strict password format
+          let randUser = generateRandomUser();
+          let email = `${randUser}@${domain}`;
+          let password = "P1@" + Math.random().toString(36).substring(2, 10) + "Aa";
 
-        // Step 3: Account Creation
-        let accRes = await safeFetch("/accounts", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address: email, password: password })
-        });
+          // 4. Register Account
+          let accRes = await fetch(`${baseUrl}/accounts`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ address: email, password: password })
+          });
 
-        if (!accRes) throw new Error("Account creation failed");
+          if (!accRes.ok && accRes.status !== 409) continue;
 
-        // Step 4: Token Fetching
-        let tokenRes = await safeFetch("/token", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address: email, password: password })
-        });
+          // 5. Get Bearer Token
+          let tokenRes = await fetch(`${baseUrl}/token`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ address: email, password: password })
+          });
 
-        if (!tokenRes) throw new Error("Token fetch failed");
-        let tokenData = await tokenRes.json();
+          if (!tokenRes.ok) continue;
+          let tokenData = await tokenRes.json();
+          if (!tokenData.token) continue;
 
-        if (!tokenData.token) throw new Error("Empty token response");
+          // Store details on success
+          activeApiBase = baseUrl;
+          currentEmail = email;
+          currentPassword = password;
+          currentToken = tokenData.token;
 
-        // Save active credentials
-        currentEmail = email;
-        currentPassword = password;
-        currentToken = tokenData.token;
+          document.getElementById('active-email').innerText = currentEmail;
 
-        document.getElementById('active-email').innerText = currentEmail;
+          localStorage.setItem('temp_mail_data', JSON.stringify({
+            email: currentEmail, password: currentPassword, token: currentToken, apiBase: activeApiBase
+          }));
 
-        localStorage.setItem('temp_mail_data', JSON.stringify({
-          email: currentEmail,
-          password: currentPassword,
-          token: currentToken,
-          apiBase: activeBase
-        }));
-
-        startPolling();
-
-      } catch (err) {
-        console.error("Mail Creation Error:", err);
-        document.getElementById('active-email').innerText = "Failed! Tap Change to retry.";
+          startPolling();
+          return;
+        } catch (err) {
+          console.warn("Domain creation error:", err);
+        }
       }
+
+      document.getElementById('active-email').innerText = "Failed to create mail!";
     }
 
     async function checkInbox() {
-      if (!currentToken) return;
+      if (!currentToken || !activeApiBase) return;
       try {
-        let res = await fetch(`${activeBase}/messages`, {
+        let res = await fetch(`${activeApiBase}/messages`, {
           headers: { "Authorization": "Bearer " + currentToken }
         });
         if (!res.ok) return;
@@ -705,7 +699,7 @@
       document.getElementById('mail-modal').classList.add('show');
 
       try {
-        let res = await fetch(`${activeBase}/messages/${msgId}`, {
+        let res = await fetch(`${activeApiBase}/messages/${msgId}`, {
           headers: { "Authorization": "Bearer " + currentToken }
         });
         let data = await res.json();
