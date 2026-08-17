@@ -625,41 +625,52 @@
             attempts++;
             try {
                 const domainRes = await fetch('https://api.mail.tm/domains', {
-                    headers: { 'Accept': 'application/json' }
+                    headers: { 
+                        'Accept': 'application/ld+json' 
+                    }
                 });
-                const domainData = await domainRes.json();
                 
-                if(!domainData['hydra:member'] || domainData['hydra:member'].length === 0) {
+                if (!domainRes.ok) throw new Error("Failed to fetch domains");
+                
+                const domainData = await domainRes.json();
+                const domainsList = domainData['hydra:member'] || domainData;
+                
+                if(!domainsList || domainsList.length === 0) {
                     throw new Error("No domains available");
                 }
                 
-                let selectedDomain = domainData['hydra:member'][0].domain;
+                let selectedDomain = domainsList[0].domain;
 
-                const randomUser = 'temp_' + Math.random().toString(36).substring(2, 11);
-                const randomPassword = Math.random().toString(36).substring(2, 15) + 'tM!';
+                const randomUser = 'user_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36).slice(-4);
+                const randomPassword = 'Pass@' + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10) + '99!';
                 const emailAddress = `${randomUser}@${selectedDomain}`;
 
                 const createAccountRes = await fetch('https://api.mail.tm/accounts', {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Accept': 'application/ld+json'
                     },
                     body: JSON.stringify({ address: emailAddress, password: randomPassword })
                 });
 
                 if (!createAccountRes.ok) {
-                    throw new Error("Account creation failed");
+                    const errDetail = await createAccountRes.json().catch(() => ({}));
+                    console.error("Account creation rejected:", errDetail);
+                    continue; // পরবর্তী এর্টেম্পটে চেষ্টা করবে
                 }
 
                 const tokenRes = await fetch('https://api.mail.tm/token', {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Accept': 'application/ld+json'
                     },
                     body: JSON.stringify({ address: emailAddress, password: randomPassword })
                 });
+                
+                if (!tokenRes.ok) continue;
+                
                 const tokenInfo = await tokenRes.json();
 
                 if (tokenInfo.token) {
@@ -677,13 +688,10 @@
                     inboxInterval = setInterval(() => {
                         checkLiveInbox(false);
                     }, 5000);
-
-                } else {
-                    throw new Error("Token generation failed");
                 }
 
             } catch (error) {
-                console.error(`Attempt ${attempts} failed:`, error);
+                console.error(`Attempt ${attempts} error:`, error);
                 if (attempts >= maxAttempts) {
                     document.getElementById('mailAddressText').value = "Failed to generate. Try again.";
                     setLoadingState(false);
@@ -707,13 +715,14 @@
             headers: {
                 'Authorization': `Bearer ${currentAccountData.token}`,
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/ld+json'
             }
         })
         .then(res => res.json())
         .then(data => {
-            if (data && data["hydra:member"] && data["hydra:member"].length > 0) {
-                const messages = data["hydra:member"].slice(0, 5);
+            const messagesList = data["hydra:member"] || data;
+            if (messagesList && Array.isArray(messagesList) && messagesList.length > 0) {
+                const messages = messagesList.slice(0, 5);
                 let checkString = messages.map(m => m.id).join(",");
                 
                 if(checkString === currentMailsIdString && !isManual) {
@@ -728,7 +737,7 @@
                         headers: {
                             'Authorization': `Bearer ${currentAccountData.token}`,
                             'Content-Type': 'application/json',
-                            'Accept': 'application/json'
+                            'Accept': 'application/ld+json'
                         }
                     })
                     .then(res => res.ok ? res.json() : null)
